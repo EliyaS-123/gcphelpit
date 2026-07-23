@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="GoogleHelpit logo">
+  <rect x="3" y="6" width="42" height="36" rx="8" fill="#0d1117" stroke="#283040" stroke-width="2"/>
+  <!-- window dots in four playful colors -->
+  <circle cx="11" cy="13" r="2.1" fill="#e2554a"/>
+  <circle cx="18" cy="13" r="2.1" fill="#e2b84a"/>
+  <circle cx="25" cy="13" r="2.1" fill="#4ae27a"/>
+  <circle cx="32" cy="13" r="2.1" fill="#4a90e2"/>
+  <!-- terminal prompt >_ -->
+  <path d="M11 24 l6 5 -6 5" fill="none" stroke="#35d07f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="21" y1="34" x2="34" y2="34" stroke="#35d07f" stroke-width="3" stroke-linecap="round"/>
+</svg>

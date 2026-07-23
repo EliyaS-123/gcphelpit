@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorials — GoogleHelpit</title>
+  <meta name="description" content="Step-by-step how-to guides for Google Cloud and Google Workspace: hard billing caps, least-privilege service accounts, Cloud Run deploys, SPF/DKIM/DMARC, GKE access, safe 2SV rollout.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="logo" src="assets/img/logo.svg" alt="">
+        <span>Google<span class="tag">Helpit</span><span class="cursor">_</span></span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="gcp-troubleshooting.html">GCP Fixes</a>
+        <a href="workspace-troubleshooting.html">Workspace Fixes</a>
+        <a href="tutorials.html" class="active">Tutorials</a>
+        <a href="tool.html">Tool</a>
+        <a href="learn.html">Learn</a>
+        <a href="certifications.html">Certs</a>
+        <a href="about.html">About</a>
+      </nav>
+      <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section style="padding-bottom:6px">
+      <div class="prompt" style="font-family:var(--mono);color:var(--accent);font-size:.9rem">$ tutorials --list</div>
+      <h1 class="section-title" style="font-size:1.9rem"><span class="hash">#</span> Tutorials</h1>
+      <p class="section-sub">Start-to-finish walkthroughs for the tasks people get stuck on. Every step links to official docs — read them and verify before running anything in production.</p>
+
+      <div class="callout tip">
+        <strong>Jump to:</strong>
+        <a href="#billing-cap">Hard billing cap</a> ·
+        <a href="#least-priv-sa">Least-privilege service account</a> ·
+        <a href="#cloud-run">Deploy to Cloud Run</a> ·
+        <a href="#gke-access">Connect to GKE</a> ·
+        <a href="#email-setup">New-domain email setup</a> ·
+        <a href="#email-auth">SPF / DKIM / DMARC</a> ·
+        <a href="#twosv">Safe 2SV rollout</a> ·
+        <a href="#shared-drive">Shared drives that survive offboarding</a>
+      </div>
+    </section>
+
+    <section class="prose" style="padding-top:6px">
+
+      <!-- ============ 1. BILLING CAP ============ -->
+      <h2 id="billing-cap">💸 Put a real hard cap on GCP spending</h2>
+      <p>A GCP budget only sends <em>alerts</em> — it never stops usage. This wires a budget to a function that actually disables billing when you cross the line. Use it on sandbox/learning projects where an overrun is worse than an outage.</p>
+      <div class="callout"><strong>Trade-off:</strong> disabling billing <em>stops resources</em> (VMs, databases). That's the point for a lab project — never do this on something serving real traffic.</div>
+      <ol class="path">
+        <li><strong>Create a budget with a threshold.</strong> Billing → <em>Budgets &amp; alerts</em> → Create budget, scope it to the project, set the amount and alert thresholds (e.g. 50/90/100%).</li>
+        <li><strong>Give the budget a Pub/Sub topic.</strong> On the budget's last step, expand <em>Manage notifications</em> and connect it to a new Pub/Sub topic (e.g. <code>billing-alerts</code>). This publishes a message every time spend updates.</li>
+        <li><strong>Deploy a function subscribed to that topic</strong> that calls the Cloud Billing API to detach the billing account:
+          <div class="codeblock"><button class="copy-btn">copy</button><code># the function's core call (Node/Python client shown in the docs)
+billing.projects.updateBillingInfo({
+  name: 'projects/PROJECT_ID',
+  requestBody: { billingAccountName: '' }   // '' = disable billing
+})</code></div>
+        </li>
+        <li><strong>Grant the function's service account the billing role.</strong> It needs <code>roles/billing.projectManager</code> (or Billing Account Admin) to detach billing.</li>
+        <li><strong>Test with a low budget.</strong> Temporarily set a tiny amount, confirm the function fires and billing detaches, then reset. Re-enabling billing later is a one-click console action.</li>
+      </ol>
+      <p class="section-sub" style="font-size:.88rem">Docs: <a href="https://cloud.google.com/billing/docs/how-to/disable-billing-with-notifications" target="_blank" rel="noopener">disable billing with notifications</a> · related fix: <a href="gcp-troubleshooting.html?q=budget">budgets don't cap spending</a>.</p>
+
+      <!-- ============ 2. LEAST-PRIV SA ============ -->
+      <h2 id="least-priv-sa">🔐 Create a least-privilege service account (no keys)</h2>
+      <p>The safe default for workloads: a dedicated service account with only the roles it needs, attached to the resource — never a downloaded JSON key.</p>
+      <ol class="path">
+        <li><strong>Create the service account:</strong>
+          <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud iam service-accounts create my-app-sa \
+  --display-name="My app runtime SA"</code></div>
+        </li>
+        <li><strong>Grant only the roles it needs</strong>, scoped as tightly as possible (project shown; prefer resource-level where supported):
+          <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:my-app-sa@PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/storage.objectViewer"</code></div>
+        </li>
+        <li><strong>Attach the SA to the workload</strong> instead of exporting a key. For Cloud Run: <code>--service-account=my-app-sa@…</code>; for a VM: set it as the instance service account; for GKE: use Workload Identity.</li>
+        <li><strong>Let the client libraries find it automatically.</strong> On Google infrastructure, Application Default Credentials use the attached SA with zero config — no key file to leak.</li>
+        <li><strong>Verify what it can do</strong> with the Policy Troubleshooter or:
+          <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud projects get-iam-policy PROJECT_ID \
+  --flatten="bindings[].members" \
+  --filter="bindings.members:my-app-sa@PROJECT_ID.iam.gserviceaccount.com"</code></div>
+        </li>
+      </ol>
+      <p class="section-sub" style="font-size:.88rem">Docs: <a href="https://cloud.google.com/iam/docs/best-practices-service-accounts" target="_blank" rel="noopener">best practices for service accounts</a> · <a href="https://cloud.google.com/iam/docs/workload-identity-federation" target="_blank" rel="noopener">Workload Identity Federation</a>.</p>
+
+      <!-- ============ 3. CLOUD RUN ============ -->
+      <h2 id="cloud-run">⚡ Deploy a container to Cloud Run (without the PORT error)</h2>
+      <p>The #1 Cloud Run failure is "container failed to start and listen on the port." Get it right the first time.</p>
+      <ol class="path">
+        <li><strong>Listen on <code>0.0.0.0:$PORT</code>.</strong> Read the port from the environment — never hardcode <code>3000</code>/<code>8080</code> or bind to <code>127.0.0.1</code>:
+          <div class="codeblock"><button class="copy-btn">copy</button><code>const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0');</code></div>
+        </li>
+        <li><strong>Enable the APIs once:</strong>
+          <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud services enable run.googleapis.com \
+  artifactregistry.googleapis.com cloudbuild.googleapis.com</code></div>
+        </li>
+        <li><strong>Deploy straight from source</strong> (Cloud Build builds &amp; pushes the image for you):
+          <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud run deploy my-service \
+  --source . --region REGION \
+  --service-account=my-app-sa@PROJECT_ID.iam.gserviceaccount.com</code></div>
+        </li>
+        <li><strong>Choose access.</strong> Add <code>--allow-unauthenticated</code> for a public site; omit it and grant callers <code>roles/run.invoker</code> for a private service.</li>
+        <li><strong>If it still fails to start,</strong> read the startup stack trace in Cloud Logging, test the image locally with <code>docker run -e PORT=8080 -p 8080:8080 IMAGE</code>, and raise the startup timeout if init is slow.</li>
+      </ol>
+      <p class="section-sub" style="font-size:.88rem">Docs: <a href="https://cloud.google.com/run/docs/deploying" target="_blank" rel="noopener">deploying to Cloud Run</a> · <a href="https://cloud.google.com/run/docs/container-contract" target="_blank" rel="noopener">container runtime contract</a> · related fix: <a href="gcp-troubleshooting.html?q=PORT">PORT error</a>.</p>
+
+      <!-- ============ 4. GKE ACCESS ============ -->
+      <h2 id="gke-access">☸️ Connect kubectl to a new GKE cluster</h2>
+      <p>Fresh cluster, and <code>kubectl</code> says "you must be logged in." You just need credentials and the auth plugin.</p>
+      <ol class="path">
+        <li><strong>Install the auth plugin</strong> (required since kubectl 1.26):
+          <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud components install gke-gcloud-auth-plugin</code></div>
+        </li>
+        <li><strong>Fetch cluster credentials into kubeconfig:</strong>
+          <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud container clusters get-credentials CLUSTER \
+  --region REGION --project PROJECT_ID</code></div>
+        </li>
+        <li><strong>Verify connectivity:</strong>
+          <div class="codeblock"><button class="copy-btn">copy</button><code>kubectl get nodes</code></div>
+        </li>
+        <li><strong>If you get 403s,</strong> grant your identity <code>roles/container.developer</code> (or <code>container.admin</code>) and make sure the Kubernetes Engine API is enabled.</li>
+      </ol>
+      <p class="section-sub" style="font-size:.88rem">Docs: <a href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl" target="_blank" rel="noopener">cluster access for kubectl</a>.</p>
+
+      <!-- ============ 5. EMAIL SETUP ============ -->
+      <h2 id="email-setup">📧 Set up Workspace email on a brand-new domain</h2>
+      <p>Get mail flowing to Gmail in the right order so you don't chase a "not receiving mail" ghost.</p>
+      <ol class="path">
+        <li><strong>Verify domain ownership.</strong> Admin console setup tool gives you a <code>google-site-verification</code> TXT record — paste the exact value into your registrar's DNS (host <code>@</code>).</li>
+        <li><strong>Replace MX records.</strong> Delete any legacy MX entries and add Google's single MX host (<code>smtp.google.com</code>, priority 1 on new setups). Only Google's MX should remain.</li>
+        <li><strong>Activate Gmail</strong> from the setup tool once records are in place. DNS can take up to 72 hours to propagate.</li>
+        <li><strong>Confirm delivery</strong> by sending a test message in and out. If inbound fails, re-check that no old MX record is still present.</li>
+        <li><strong>Then</strong> set up email authentication (next tutorial) before you send anything at volume.</li>
+      </ol>
+      <p class="section-sub" style="font-size:.88rem">Docs: <a href="https://support.google.com/a/answer/16018515" target="_blank" rel="noopener">verify your domain</a> · <a href="https://support.google.com/a/answer/16004259" target="_blank" rel="noopener">set up MX records</a>.</p>
+
+      <!-- ============ 6. EMAIL AUTH ============ -->
+      <h2 id="email-auth">✉️ Set up SPF, DKIM &amp; DMARC (in the right order)</h2>
+      <p>Order matters. Authenticate first, enforce last — or you'll bounce your own mail. Since Feb 2024 Gmail requires this for reliable delivery.</p>
+      <ol class="path">
+        <li><strong>SPF</strong> — publish exactly <em>one</em> TXT record listing every sender:
+          <div class="codeblock"><button class="copy-btn">copy</button><code>v=spf1 include:_spf.google.com ~all</code></div>
+          Keep total DNS lookups under 10. No Admin-console step needed.</li>
+        <li><strong>DKIM</strong> — Admin console → Apps → Gmail → <em>Authenticate email</em> → generate a 2048-bit key → add the TXT record at your host → return and click <em>Start authentication</em>.</li>
+        <li><strong>Let both settle for at least 48 hours</strong> and confirm they pass (check message headers: <code>spf=pass</code>, <code>dkim=pass</code>).</li>
+        <li><strong>DMARC — start at monitor only:</strong>
+          <div class="codeblock"><button class="copy-btn">copy</button><code>v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com</code></div>
+        </li>
+        <li><strong>Review reports, then tighten</strong> to <code>p=quarantine</code> and eventually <code>p=reject</code> once you've confirmed all legitimate mail aligns.</li>
+      </ol>
+      <p class="section-sub" style="font-size:.88rem">Docs: <a href="https://support.google.com/a/answer/33786" target="_blank" rel="noopener">SPF</a> · <a href="https://support.google.com/a/answer/174124" target="_blank" rel="noopener">DKIM</a> · <a href="https://support.google.com/a/answer/2466580" target="_blank" rel="noopener">DMARC</a> · related fixes: <a href="workspace-troubleshooting.html?q=dmarc">email auth</a>.</p>
+
+      <!-- ============ 7. 2SV ============ -->
+      <h2 id="twosv">🔒 Roll out 2-Step Verification without mass lockouts</h2>
+      <p>Enforcing 2SV before people enroll locks everyone out at once. Sequence it.</p>
+      <ol class="path">
+        <li><strong>Prep admins first.</strong> Ensure 2+ super admins have recovery email/phone set, so a bad rollout can't lock you out of the console.</li>
+        <li><strong>Turn on allowance, not enforcement.</strong> Security → Authentication → 2-Step Verification → allow users to turn it on.</li>
+        <li><strong>Announce + set an enrollment period.</strong> Give users a deadline (e.g. 2–4 weeks) to enroll a second factor.</li>
+        <li><strong>Enforce per-OU</strong> after the window, starting with a pilot OU. Prefer a grace period for new users.</li>
+        <li><strong>Plan for lost factors.</strong> Admins can issue backup codes (Directory → Users → Security). Note: "only security key" mode disables self-service backup codes — the admin must generate them.</li>
+      </ol>
+      <p class="section-sub" style="font-size:.88rem">Docs: <a href="https://support.google.com/a/answer/9176657" target="_blank" rel="noopener">deploy 2SV</a> · <a href="https://support.google.com/a/answer/9176805" target="_blank" rel="noopener">avoid lockouts</a> · related fix: <a href="workspace-troubleshooting.html?q=2-step">2SV lockouts</a>.</p>
+
+      <!-- ============ 8. SHARED DRIVES ============ -->
+      <h2 id="shared-drive">📂 Use shared drives so files survive offboarding</h2>
+      <p>My Drive files are owned by the person — delete the account and they can orphan. Shared drives are owned by the org. Set teams up this way from day one.</p>
+      <ol class="path">
+        <li><strong>Enable shared drives</strong> for the right OU: Admin console → Apps → Google Workspace → Drive and Docs → <em>Sharing settings / Manage shared drives</em>.</li>
+        <li><strong>Create a shared drive per team</strong> and add members by <em>group</em> (not individuals) so membership tracks your directory.</li>
+        <li><strong>Set member roles</strong> deliberately — Manager, Content manager, Contributor, Commenter, Viewer.</li>
+        <li><strong>Move existing team files in.</strong> Ownership transfers to the shared drive (org-owned) so departures don't orphan anything.</li>
+        <li><strong>For any remaining My Drive files,</strong> transfer ownership <em>before</em> deleting a user — the delete flow offers a data transfer step.</li>
+      </ol>
+      <p class="section-sub" style="font-size:.88rem">Docs: <a href="https://support.google.com/a/answer/7337469" target="_blank" rel="noopener">set up shared drives</a> · <a href="https://support.google.com/a/answer/7662202" target="_blank" rel="noopener">manage shared drives</a>.</p>
+
+      <div class="callout info">
+        More coming. Once the <a href="tool.html">Troubleshooter</a> ships, these tutorials will link directly into it so you can go from "which step am I on?" to a guided diagnosis.
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cols">
+        <div><strong>GoogleHelpit</strong> — your nerdy Google IT helper.</div>
+        <div>
+          <a href="index.html">Home</a> ·
+          <a href="gcp-troubleshooting.html">GCP Fixes</a> ·
+          <a href="workspace-troubleshooting.html">Workspace Fixes</a> ·
+          <a href="tool.html">Tool</a> ·
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gcphelpit — the GoogleHelpit CLI that scans GCP for issues</title>
+  <meta name="description" content="gcphelpit is a friendly command-line tool that scans a snapshot of your Google Cloud project and finds security, IAM, cost, and reliability issues — each with a plain-English fix.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="logo" src="assets/img/logo.svg" alt="">
+        <span>Google<span class="tag">Helpit</span><span class="cursor">_</span></span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="gcp-troubleshooting.html">GCP Fixes</a>
+        <a href="workspace-troubleshooting.html">Workspace Fixes</a>
+        <a href="tutorials.html">Tutorials</a>
+        <a href="tool.html" class="active">Tool</a>
+        <a href="learn.html">Learn</a>
+        <a href="certifications.html">Certs</a>
+        <a href="about.html">About</a>
+      </nav>
+      <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" style="padding:52px 0 28px">
+      <div class="prompt">$ gcphelpit scan</div>
+      <h1 style="font-size:clamp(1.9rem,4.5vw,2.8rem)"><span class="grad">gcphelpit</span> — the GoogleHelpit CLI</h1>
+      <p class="sub">
+        A friendly command-line tool that scans a snapshot of your Google Cloud project and finds
+        <strong>security, IAM, cost, and reliability</strong> issues — each with a plain-English fix.
+      </p>
+      <p>
+        <span class="badge assoc">✓ open source</span>
+        <span class="badge found">Python 3.9+</span>
+        <span class="badge pro">16 built-in checks</span>
+        <span class="badge soon">mock-first · no cloud access needed</span>
+      </p>
+    </section>
+
+    <section class="prose" style="padding-top:6px">
+      <div class="callout tip">
+        <strong>How it works:</strong> gcphelpit is <em>mock-first</em>. It reads a JSON snapshot of your resources,
+        so it runs — and is fully testable — with zero cloud access. A live GCP adapter can be layered on later
+        behind the same interface.
+      </div>
+
+      <h2>Install &amp; run</h2>
+      <p>Clone the repo, set up a virtualenv, and scan the bundled demo snapshot:</p>
+      <div class="codeblock"><button class="copy-btn">copy</button><code>git clone https://github.com/EliyaS-123/gcphelpit-cli && cd gcphelpit-cli
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .
+
+# Scan the bundled demo snapshot
+gcphelpit scan</code></div>
+      <p>You'll get a colour-coded table of findings, each with the offending resource and a recommended fix.</p>
+
+      <h2>What it checks</h2>
+      <p>Every finding comes with the offending resource and a recommended fix. Checks span four categories:</p>
+      <div class="res-grid">
+        <div class="res-card">
+          <h3>🔒 Security</h3>
+          <p class="meta">exposure &amp; access</p>
+          <p>Public buckets, world-open firewall ports, and public / no-SSL Cloud SQL instances.</p>
+        </div>
+        <div class="res-card">
+          <h3>👤 IAM</h3>
+          <p class="meta">least privilege</p>
+          <p>Primitive owner/editor roles, external members, and user-managed service-account keys.</p>
+        </div>
+        <div class="res-card">
+          <h3>💸 Cost</h3>
+          <p class="meta">stop the bleed</p>
+          <p>Unattached disks, idle static IPs, stopped VMs still holding disks, and missing budget alerts.</p>
+        </div>
+        <div class="res-card">
+          <h3>🛟 Reliability</h3>
+          <p class="meta">don't lose data</p>
+          <p>Missing DB backups, single-zone production databases, and no deletion protection.</p>
+        </div>
+      </div>
+
+      <h2>Sample output</h2>
+      <p>A scan of the bundled insecure demo snapshot looks roughly like this:</p>
+      <div class="codeblock"><button class="copy-btn">copy</button><code>              gcphelpit — findings for demo-insecure-project
+
+✖ CRITICAL  SEC001   storage.bucket/public-assets    Bucket is publicly readable (allUsers)
+▲ HIGH      SEC003   compute.firewall/allow-ssh      Port 22 open to 0.0.0.0/0
+▲ HIGH      IAM001   iam.policy/roles/owner          Primitive 'owner' role granted to a user
+● MEDIUM    COST001  compute.disk/orphan-disk-1      Disk is unattached — costing money idle
+• LOW       REL003   sql.instance/prod-db            Production DB runs in a single zone
+... 11 more findings across security, iam, cost, reliability</code></div>
+
+      <h2>Usage</h2>
+      <p>Filter by category or severity, emit JSON, or gate CI/CD on findings:</p>
+      <div class="codeblock"><button class="copy-btn">copy</button><code>gcphelpit scan                          # scan the bundled demo snapshot
+gcphelpit scan -f my-project.json       # scan your own snapshot
+gcphelpit scan --category security      # only security checks (repeatable)
+gcphelpit scan --min-severity high      # only high/critical findings
+gcphelpit scan --format json            # machine-readable output
+gcphelpit scan --fail-on high           # exit non-zero for CI/CD gating
+gcphelpit checks                        # list every check in the catalog</code></div>
+      <p><strong>Exit codes:</strong> <code>0</code> clean · <code>1</code> findings at/above <code>--fail-on</code> · <code>2</code> usage/error.</p>
+
+      <h2>The snapshot</h2>
+      <p>A snapshot is a plain JSON object describing what you collected from a project. Every top-level key is
+        optional — checks simply skip data that isn't there:</p>
+      <div class="codeblock"><button class="copy-btn">copy</button><code>{
+  "project_id": "my-project",
+  "buckets": [ { "name": "assets", "uniform_bucket_level_access": true, "iam_bindings": [] } ],
+  "firewalls": [],
+  "instances": [],
+  "disks": [],
+  "addresses": [],
+  "service_accounts": [],
+  "iam_policy": { "bindings": [] },
+  "sql_instances": [],
+  "budgets": []
+}</code></div>
+
+      <h2>Check catalog</h2>
+      <p>Run <code>gcphelpit checks</code> to list every built-in check. They span four categories:</p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Category</th><th>Examples</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="badge assoc">security</span></td>
+                <td>public buckets, world-open firewall ports, public / no-SSL Cloud SQL</td></tr>
+            <tr><td><span class="badge found">iam</span></td>
+                <td>primitive owner/editor roles, external members, user-managed SA keys</td></tr>
+            <tr><td><span class="badge pro">cost</span></td>
+                <td>unattached disks, idle static IPs, stopped VMs, no budget alert</td></tr>
+            <tr><td><span class="badge soon">reliability</span></td>
+                <td>no DB backups, single-zone prod DB, no deletion protection</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Roadmap</h2>
+      <ol class="path">
+        <li><strong>v1 — Mock-first CLI (shipping).</strong> Scan a JSON snapshot across security, IAM, cost, and reliability, with JSON output and CI/CD exit-code gating.</li>
+        <li><strong>v2 — Live GCP adapter.</strong> An opt-in connector that builds the snapshot from your own project (read-only, with your consent and credentials) behind the same interface.</li>
+        <li><strong>v3 — Browser troubleshooter.</strong> Fold the check catalog into an interactive symptom→cause→fix diagnostic on this site, cross-linked to the <a href="gcp-troubleshooting.html">GCP fix library</a>.</li>
+      </ol>
+
+      <div class="callout info">
+        <strong>Spot a missing check?</strong> The <a href="gcp-troubleshooting.html">GCP</a> and
+        <a href="workspace-troubleshooting.html">Workspace</a> fix libraries are the tool's brain. If a fix is
+        missing or a symptom isn't covered, that's exactly the gap gcphelpit should close.
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cols">
+        <div><strong>GoogleHelpit</strong> — your nerdy Google IT helper.</div>
+        <div>
+          <a href="index.html">Home</a> ·
+          <a href="gcp-troubleshooting.html">GCP Fixes</a> ·
+          <a href="workspace-troubleshooting.html">Workspace Fixes</a> ·
+          <a href="tutorials.html">Tutorials</a> ·
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoogleHelpit — Your nerdy Google IT helper</title>
+  <meta name="description" content="An independent community hub of troubleshooting guides, learning resources, and certifications for Google Cloud (GCP) and Google Workspace. Not affiliated with Google LLC.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="logo" src="assets/img/logo.svg" alt="">
+        <span>Google<span class="tag">Helpit</span><span class="cursor">_</span></span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+      <nav class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="gcp-troubleshooting.html">GCP Fixes</a>
+        <a href="workspace-troubleshooting.html">Workspace Fixes</a>
+        <a href="tutorials.html">Tutorials</a>
+        <a href="tool.html">Tool</a>
+        <a href="learn.html">Learn</a>
+        <a href="certifications.html">Certs</a>
+        <a href="about.html">About</a>
+      </nav>
+      <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="prompt">$ ./googlehelpit --help</div>
+        <h1>Your nerdy <span class="grad">Google IT</span> helper</h1>
+        <p class="sub">
+          Stuck on a Google Cloud error? Fighting with Workspace DNS? Not sure where to learn or which cert to chase?
+          GoogleHelpit is a community cheat-sheet: real fixes, curated learning, and a straight path through the certs.
+        </p>
+        <div class="search-wrap">
+          <span class="sigil">&gt;</span>
+          <input id="site-search" type="search" placeholder="Search a problem, e.g. 'permission denied' or 'MX record'…" autocomplete="off" aria-label="Search troubleshooting">
+          <div class="search-hint">↵ Enter to search the troubleshooting guides</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="n">60+</div><div class="l">GCP fixes</div></div>
+          <div class="stat"><div class="n">40+</div><div class="l">Workspace fixes</div></div>
+          <div class="stat"><div class="n">8</div><div class="l">Tutorials</div></div>
+          <div class="stat"><div class="n">100%</div><div class="l">Free</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title"><span class="hash">#</span> Where do you want to go?</h2>
+        <p class="section-sub">Pick a lane. Everything links out to official Google documentation as the source of truth.</p>
+        <div class="card-grid">
+          <a class="nav-card" href="gcp-troubleshooting.html">
+            <div class="ico">☁️</div>
+            <h3>GCP Troubleshooting</h3>
+            <p>Billing surprises, IAM "permission denied", quotas, SSH, Cloud Run deploy fails, GKE crashes — with the actual fix.</p>
+            <span class="go">browse fixes →</span>
+          </a>
+          <a class="nav-card" href="workspace-troubleshooting.html">
+            <div class="ico">📧</div>
+            <h3>Workspace Troubleshooting</h3>
+            <p>Domain verification, MX/SPF/DKIM/DMARC, Gmail in spam, admin lockouts, SSO, Drive sharing, migrations.</p>
+            <span class="go">browse fixes →</span>
+          </a>
+          <a class="nav-card" href="tutorials.html">
+            <div class="ico">📝</div>
+            <h3>Tutorials</h3>
+            <p>Start-to-finish walkthroughs: hard billing caps, least-privilege service accounts, Cloud Run deploys, SPF/DKIM/DMARC, safe 2SV rollout.</p>
+            <span class="go">follow a guide →</span>
+          </a>
+          <a class="nav-card" href="tool.html">
+            <div class="ico">🔧</div>
+            <h3>gcphelpit CLI <span class="badge assoc">new</span></h3>
+            <p>A friendly command-line tool that scans a snapshot of your GCP project for security, IAM, cost, and reliability issues — each with a plain-English fix.</p>
+            <span class="go">install &amp; run →</span>
+          </a>
+          <a class="nav-card" href="learn.html">
+            <div class="ico">📚</div>
+            <h3>Learn GCP & Workspace</h3>
+            <p>The best free and paid resources: Skills Boost, Coursera, YouTube, communities, and books — no fluff.</p>
+            <span class="go">start learning →</span>
+          </a>
+          <a class="nav-card" href="certifications.html">
+            <div class="ico">🎓</div>
+            <h3>Certifications</h3>
+            <p>Every Google Cloud & Workspace cert — cost, format, validity — plus a beginner-to-pro learning path.</p>
+            <span class="go">see the path →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title"><span class="hash">#</span> Two things that trip up almost everyone</h2>
+        <p class="section-sub">If you only remember two facts, make them these.</p>
+        <div class="card-grid">
+          <div class="nav-card" style="cursor:default">
+            <div class="ico">💸</div>
+            <h3>Budgets don't cap spending</h3>
+            <p>A GCP budget only sends <em>alerts</em>. It never stops usage or billing. For a true hard stop you must wire a budget's Pub/Sub notification to a function that disables billing.</p>
+          </div>
+          <div class="nav-card" style="cursor:default">
+            <div class="ico">🔑</div>
+            <h3>Two different "auth login"s</h3>
+            <p><code>gcloud auth login</code> only authenticates the CLI. Your app's client libraries use <em>ADC</em> — run <code>gcloud auth application-default login</code> too, or you'll get "could not determine credentials."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cols">
+        <div>
+          <strong>GoogleHelpit</strong> — your nerdy Google IT helper.<br>
+          Built by the community, for the community.
+        </div>
+        <div>
+          <a href="gcp-troubleshooting.html">GCP Fixes</a> ·
+          <a href="workspace-troubleshooting.html">Workspace Fixes</a> ·
+          <a href="learn.html">Learn</a> ·
+          <a href="certifications.html">Certs</a> ·
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

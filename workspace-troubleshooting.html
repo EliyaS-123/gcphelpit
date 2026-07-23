@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workspace Troubleshooting — GoogleHelpit</title>
+  <meta name="description" content="Common Google Workspace admin & user problems and fixes: DNS/MX, SPF/DKIM/DMARC, Gmail spam, admin lockouts, SSO, Drive sharing, migration. Independent community guide.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="logo" src="assets/img/logo.svg" alt="">
+        <span>Google<span class="tag">Helpit</span><span class="cursor">_</span></span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="gcp-troubleshooting.html">GCP Fixes</a>
+        <a href="workspace-troubleshooting.html" class="active">Workspace Fixes</a>
+        <a href="tutorials.html">Tutorials</a>
+        <a href="tool.html">Tool</a>
+        <a href="learn.html">Learn</a>
+        <a href="certifications.html">Certs</a>
+        <a href="about.html">About</a>
+      </nav>
+      <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section style="padding-bottom:10px">
+      <div class="prompt" style="font-family:var(--mono);color:var(--accent);font-size:.9rem">$ workspace --fix</div>
+      <h1 class="section-title" style="font-size:1.9rem"><span class="hash">#</span> Workspace Troubleshooting</h1>
+      <p class="section-sub">The problems that eat Workspace admins alive — DNS, email auth, deliverability, lockouts, SSO, sharing, migration. Symptom → cause → fix → official help.</p>
+
+      <div class="filter-bar">
+        <input id="filter-box" class="filter-box" type="search" placeholder="Filter fixes… e.g. 'MX record', 'spam', 'DKIM', 'super admin'" autocomplete="off" aria-label="Filter Workspace fixes">
+      </div>
+      <div class="chips">
+        <span class="chip active" data-cat="all">all</span>
+        <span class="chip" data-cat="dns">domain / dns</span>
+        <span class="chip" data-cat="emailauth">spf / dkim / dmarc</span>
+        <span class="chip" data-cat="gmail">gmail delivery</span>
+        <span class="chip" data-cat="admin">admin console</span>
+        <span class="chip" data-cat="security">recovery / security</span>
+        <span class="chip" data-cat="sso">sso / saml</span>
+        <span class="chip" data-cat="drive">drive / sharing</span>
+        <span class="chip" data-cat="migration">migration</span>
+        <span class="chip" data-cat="meet">calendar / meet</span>
+        <span class="chip" data-cat="mdm">mdm</span>
+        <span class="chip" data-cat="groups">groups / chat</span>
+        <span class="chip" data-cat="vault">vault / retention</span>
+        <span class="chip" data-cat="sync">directory sync</span>
+        <span class="chip" data-cat="billing">billing</span>
+      </div>
+      <div class="no-results">// no matching fixes — try a different term or category.</div>
+
+      <!-- DNS -->
+      <div class="cat-group">
+        <h2>🌍 Domain &amp; DNS setup</h2>
+
+        <details class="issue" data-cat="dns">
+          <summary><span class="caret">▸</span><span class="sym">Domain won't verify / "We couldn't verify your domain"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The <code>google-site-verification</code> TXT record was added incorrectly (extra characters, wrong host field), or DNS hasn't propagated.</dd>
+            <dt>Fix</dt><dd>Paste the exact TXT value into the host/@ record at your registrar; leave old records intact; allow up to 72 hours, then click Verify again. Use the setup tool's registrar-specific instructions.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/16018515" target="_blank" rel="noopener">verify your domain</a> · <a href="https://support.google.com/a/answer/48090" target="_blank" rel="noopener">DNS basics</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="dns">
+          <summary><span class="caret">▸</span><span class="sym">Gmail not receiving mail / MX records wrong</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>MX records still point to the old mail host, or priorities/values are malformed. Mail must route to Google's servers.</dd>
+            <dt>Fix</dt><dd>At your registrar, replace existing MX records with Google's MX host (single <code>smtp.google.com</code>, priority 1 on new setups); delete legacy MX entries; allow up to 72 hours; activate Gmail from the setup tool.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/16004259" target="_blank" rel="noopener">set up MX records</a> · <a href="https://support.google.com/a/answer/2716802" target="_blank" rel="noopener">record values</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="dns">
+          <summary><span class="caret">▸</span><span class="sym">Multiple / conflicting TXT or verification records left in DNS</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Old provider verification or SPF records not removed, causing lookup failures.</dd>
+            <dt>Fix</dt><dd>Keep only one SPF record; remove obsolete verification TXT records once verified — but leave the Google verification record (removing it can un-verify the domain).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/2716802" target="_blank" rel="noopener">support.google.com/a/answer/2716802</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- EMAIL AUTH -->
+      <div class="cat-group">
+        <h2>✉️ Email authentication (SPF / DKIM / DMARC)</h2>
+
+        <details class="issue" data-cat="emailauth">
+          <summary><span class="caret">▸</span><span class="sym">SPF failing or "too many DNS lookups" (permerror)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>No SPF record, more than one SPF record, or exceeding the 10 DNS-lookup limit from many <code>include:</code> statements.</dd>
+            <dt>Fix</dt><dd>Publish a single TXT record and merge all senders into it:
+              <div class="codeblock"><button class="copy-btn">copy</button><code>v=spf1 include:_spf.google.com ~all</code></div>
+              Flatten/reduce includes to stay under 10 lookups. SPF needs no Admin console action; allow up to 48 hours.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/33786" target="_blank" rel="noopener">support.google.com/a/answer/33786</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="emailauth">
+          <summary><span class="caret">▸</span><span class="sym">DKIM not signing / "DKIM = neutral (no signature)"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>DKIM was never generated/enabled in the Admin console, or the DNS TXT key wasn't added at the host.</dd>
+            <dt>Fix</dt><dd>Admin console → Apps → Google Workspace → Gmail → <em>Authenticate email</em> → Generate new record (2048-bit); add the TXT record at your host; return and click <em>Start authentication</em>.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/174124" target="_blank" rel="noopener">support.google.com/a/answer/174124</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="emailauth">
+          <summary><span class="caret">▸</span><span class="sym">DMARC rejecting your own mail / DMARC failures</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>DMARC policy (<code>p=quarantine</code>/<code>reject</code>) enforced before SPF and DKIM were aligned and stable.</dd>
+            <dt>Fix</dt><dd>Set up SPF and DKIM first and let them authenticate for at least 48 hours; start DMARC at <code>p=none</code> with a <code>rua=</code> reporting address; tighten to quarantine/reject after reviewing reports.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/2466580" target="_blank" rel="noopener">set up DMARC</a> · <a href="https://support.google.com/a/answer/10032578" target="_blank" rel="noopener">troubleshoot</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- GMAIL DELIVERY -->
+      <div class="cat-group">
+        <h2>📨 Gmail delivery problems</h2>
+
+        <details class="issue" data-cat="gmail">
+          <summary><span class="caret">▸</span><span class="sym">Outbound mail lands in recipients' spam</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Missing SPF/DKIM/DMARC, missing PTR (reverse DNS), or a high spam-complaint rate. Since Feb 2024 Gmail enforces sender guidelines.</dd>
+            <dt>Fix</dt><dd>Set up SPF or DKIM (both if bulk), valid forward+reverse DNS, one-click unsubscribe for bulk mail, and keep the Postmaster Tools spam rate under 0.3%.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/mail/answer/81126" target="_blank" rel="noopener">sender guidelines</a> · <a href="https://support.google.com/a/answer/14229414" target="_blank" rel="noopener">FAQ</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gmail">
+          <summary><span class="caret">▸</span><span class="sym">Legitimate inbound mail marked as spam</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Sender fails authentication or matches spam patterns; no allowlist configured.</dd>
+            <dt>Fix</dt><dd>Admin console → Apps → Gmail → Spam, phishing, and malware → add trusted domains to an allowlist / approved-senders list. Avoid over-broad allowlisting (spoofing risk).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/60752" target="_blank" rel="noopener">a/answer/60752</a> · <a href="https://support.google.com/a/answer/7663057" target="_blank" rel="noopener">approved senders</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gmail">
+          <summary><span class="caret">▸</span><span class="sym">"Message blocked" / 550-5.7.1 or 421 rejections</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Sender flagged for suspicious/bulk activity, failed authentication, or hit a sending limit.</dd>
+            <dt>Fix</dt><dd>Verify the account isn't compromised, confirm SPF/DKIM, reduce send rate, and review the bounce code; use SMTP relay properly for app/bulk mail.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/mail/answer/81126" target="_blank" rel="noopener">error reference</a> · <a href="https://support.google.com/a/answer/6389191" target="_blank" rel="noopener">SMTP relay</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gmail">
+          <summary><span class="caret">▸</span><span class="sym">"You have reached a limit for sending mail"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Exceeded Workspace daily recipient/message caps (e.g. ~2,000 external recipients/day) — often from a mass mailing or a compromised account.</dd>
+            <dt>Fix</dt><dd>Wait ~24 hours for the limit to reset; split large sends across days; use Google Groups or a bulk/SMTP-relay solution; check for compromise.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/166852" target="_blank" rel="noopener">sending limits</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gmail">
+          <summary><span class="caret">▸</span><span class="sym">App / printer / scanner can't send via SMTP</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Devices using the old <code>smtp.gmail.com</code> + password fail once Less Secure Apps is off; or SMTP relay isn't configured for the sending IP.</dd>
+            <dt>Fix</dt><dd>For a single account, use an app password (requires 2SV) with <code>smtp.gmail.com:587</code>. For org devices/apps, set up the <strong>SMTP relay service</strong> (Apps → Gmail → Routing) allowlisting the static IP; use <code>smtp-relay.gmail.com</code>.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/2956491" target="_blank" rel="noopener">send from a device/app</a> · <a href="https://support.google.com/a/answer/6389191" target="_blank" rel="noopener">SMTP relay</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="cat-group">
+        <h2>🛠️ Admin console basics (users, groups, OUs, licensing)</h2>
+
+        <details class="issue" data-cat="admin">
+          <summary><span class="caret">▸</span><span class="sym">Can't add a user / "You've used all your licenses"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>On an Annual/Fixed-Term plan you can't exceed purchased licenses without buying more.</dd>
+            <dt>Fix</dt><dd>Buy more licenses (Billing → Subscriptions) or free one by deleting/suspending an unused account, then add the user in Directory → Users.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/33310" target="_blank" rel="noopener">add a user</a> · <a href="https://support.google.com/a/answer/6309862" target="_blank" rel="noopener">licensing</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="admin">
+          <summary><span class="caret">▸</span><span class="sym">Settings not applying to a subset of users</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The policy is set at the wrong organizational unit (OU); child OUs inherit unless overridden.</dd>
+            <dt>Fix</dt><dd>Create/select the correct OU, move users there (Directory → Users → Change organizational unit), and apply the setting at that OU. Allow up to 24 hours to propagate.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/182537" target="_blank" rel="noopener">add an OU</a> · <a href="https://support.google.com/a/answer/4352075" target="_blank" rel="noopener">OU structure</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="admin">
+          <summary><span class="caret">▸</span><span class="sym">Group vs. OU confusion (permissions not behaving)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>OUs control service/policy settings; Groups control access and mailing — admins often conflate them.</dd>
+            <dt>Fix</dt><dd>Use OUs for policies, Groups for access/distribution. Add members in Directory → Groups; consider access groups for cross-OU service control.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/167085" target="_blank" rel="noopener">groups</a> · <a href="https://support.google.com/a/answer/9050643" target="_blank" rel="noopener">access groups</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="cat-group">
+        <h2>🔒 Account recovery &amp; security</h2>
+
+        <details class="issue" data-cat="security">
+          <summary><span class="caret">▸</span><span class="sym">Locked out of the only super admin account</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>No secondary super admin and no/outdated recovery options.</dd>
+            <dt>Fix</dt><dd>Use the admin recovery flow at the sign-in page; if that fails, use the domain-verification recovery form (add a CNAME/TXT to DNS to prove ownership). Always keep 2+ super admins.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/33561" target="_blank" rel="noopener">support.google.com/a/answer/33561</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="security">
+          <summary><span class="caret">▸</span><span class="sym">Admin can't self-reset password</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Super admin password recovery is disabled, or recovery email/phone is missing.</dd>
+            <dt>Fix</dt><dd>Have another super admin reset it in Directory → Users; enable "Allow super administrators to recover their password"; add recovery email/phone for all admins.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/9436964" target="_blank" rel="noopener">a/answer/9436964</a> · <a href="https://support.google.com/a/answer/3033063" target="_blank" rel="noopener">recovery info</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="security">
+          <summary><span class="caret">▸</span><span class="sym">Users locked out after 2-Step Verification enforced</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>2SV was enforced before users enrolled, or a user lost their second factor.</dd>
+            <dt>Fix</dt><dd>Set an enrollment grace period before enforcing; admins can generate backup codes (Directory → Users → Security) or move the user to an OU where 2SV isn't yet enforced.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/9176805" target="_blank" rel="noopener">avoid lockouts</a> · <a href="https://support.google.com/a/answer/9176734" target="_blank" rel="noopener">recover</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="security">
+          <summary><span class="caret">▸</span><span class="sym">Deploying 2SV / security keys without mass lockouts</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Rushed enforcement without user enrollment causes mass lockouts.</dd>
+            <dt>Fix</dt><dd>Announce, allow enrollment, then enforce per-OU (Security → Authentication → 2-Step Verification). "Only security key" mode blocks self-service backup codes — the admin must issue them.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/9176657" target="_blank" rel="noopener">deploy 2SV</a> · <a href="https://support.google.com/a/answer/175197" target="_blank" rel="noopener">overview</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="security">
+          <summary><span class="caret">▸</span><span class="sym">Suspicious login / a user account was compromised</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Phished or reused password; attacker may have added forwarding rules, app passwords, or recovery changes.</dd>
+            <dt>Fix</dt><dd>Suspend or reset the user (Directory → Users), sign out all sessions, then <em>investigate</em>: revoke app passwords/OAuth tokens, remove rogue mail filters/forwarding, check the Security Investigation/audit logs, and re-enable after cleanup.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/2984349" target="_blank" rel="noopener">secure a compromised account</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- SSO -->
+      <div class="cat-group">
+        <h2>🪪 SSO / SAML integration</h2>
+
+        <details class="issue" data-cat="sso">
+          <summary><span class="caret">▸</span><span class="sym">"app_not_configured_for_user" / SAML app error</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The user isn't assigned/provisioned to the SAML app, or the NameID doesn't match a Workspace username.</dd>
+            <dt>Fix</dt><dd>Ensure the IdP sends the primary Workspace email as NameID; assign the app to the correct OU/users; verify ACS URL and Entity ID match.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/6301076" target="_blank" rel="noopener">SAML errors</a> · <a href="https://support.google.com/a/answer/6087519" target="_blank" rel="noopener">custom SAML app</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="sso">
+          <summary><span class="caret">▸</span><span class="sym">SSO login fails: certificate or clock errors</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The IdP signing certificate doesn't match the public cert uploaded to Google, or the IdP server clock is skewed (assertion outside the valid time window).</dd>
+            <dt>Fix</dt><dd>Re-upload the current IdP certificate; sync the IdP clock to reliable NTP; ensure responses are unencrypted (Google accepts unencrypted SAML only).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/2463723" target="_blank" rel="noopener">SSO troubleshooting</a> · <a href="https://support.google.com/a/answer/6262818" target="_blank" rel="noopener">FAQ</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="sso">
+          <summary><span class="caret">▸</span><span class="sym">Admin locked out of console by SSO</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>SSO applies to admins too, and the IdP is misconfigured or down.</dd>
+            <dt>Fix</dt><dd>Sign in via the super-admin SSO-bypass URL to reach the console and fix the profile; always keep an SSO-exempt super admin.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/12032922" target="_blank" rel="noopener">set up SSO</a> · <a href="https://support.google.com/a/answer/2463723" target="_blank" rel="noopener">troubleshoot</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- DRIVE -->
+      <div class="cat-group">
+        <h2>📂 Drive &amp; sharing</h2>
+
+        <details class="issue" data-cat="drive">
+          <summary><span class="caret">▸</span><span class="sym">External sharing blocked / "You can't share outside your organization"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Admin external-sharing policy restricts sharing beyond the domain (default for some tiers/edu).</dd>
+            <dt>Fix</dt><dd>Admin console → Apps → Google Workspace → Drive and Docs → Sharing settings; set external sharing per OU (allowlisted domains, warnings, etc.).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/60781" target="_blank" rel="noopener">support.google.com/a/answer/60781</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="drive">
+          <summary><span class="caret">▸</span><span class="sym">"Shared drive is full" — can't add/edit files</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The shared drive hit its storage limit, or org pooled storage is exhausted.</dd>
+            <dt>Fix</dt><dd>Delete/move files, raise the shared drive's limit (Apps → Drive → Manage shared drives), or add storage. Review org-wide usage in Storage.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/14853986" target="_blank" rel="noopener">shared drive limits</a> · <a href="https://support.google.com/a/answer/12002268" target="_blank" rel="noopener">review storage</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="drive">
+          <summary><span class="caret">▸</span><span class="sym">Files owned by a departing employee become inaccessible</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>My Drive files are owned by the individual; deleting the account can orphan them.</dd>
+            <dt>Fix</dt><dd>Before deleting, transfer ownership (the Directory → Users delete flow offers data transfer), or store team files in shared drives (org-owned) from the start.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/7662202" target="_blank" rel="noopener">manage shared drives</a> · <a href="https://support.google.com/a/answer/7337469" target="_blank" rel="noopener">set up shared drives</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- MIGRATION -->
+      <div class="cat-group">
+        <h2>🚚 Data migration</h2>
+
+        <details class="issue" data-cat="migration">
+          <summary><span class="caret">▸</span><span class="sym">Data Migration Service (IMAP) fails to connect</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>IMAP disabled on source or destination, wrong server/port, or an app-specific password is required (accounts with 2FA).</dd>
+            <dt>Fix</dt><dd>Enable IMAP on both sides; use the correct IMAP host/port; generate an app-specific password on the source; run as a super admin.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/14792325" target="_blank" rel="noopener">a/answer/14792325</a> · <a href="https://support.google.com/a/answer/9476255" target="_blank" rel="noopener">new DMS</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="migration">
+          <summary><span class="caret">▸</span><span class="sym">Migration is slow / hits the 100-user batch limit</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>DMS migrates up to 100 IMAP users per batch and throttles large mailboxes.</dd>
+            <dt>Fix</dt><dd>Split users into batches of ≤100 (CSV for &gt;20 users); run overnight; migrate additional folders/users in a new job.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/7032598" target="_blank" rel="noopener">DMS FAQ</a> · <a href="https://support.google.com/a/answer/9413033" target="_blank" rel="noopener">product matrix</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- MEET -->
+      <div class="cat-group">
+        <h2>📅 Calendar &amp; Meet</h2>
+
+        <details class="issue" data-cat="meet">
+          <summary><span class="caret">▸</span><span class="sym">External guests can't join a Meet / stuck in the waiting room</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Only the meeting host (same domain) can admit external participants, and they must be present; admin policy may restrict external join.</dd>
+            <dt>Fix</dt><dd>Ensure the host is on the call to admit guests; Admin console → Apps → Google Meet → allow users to join meetings from outside the org / external participation.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/7304109" target="_blank" rel="noopener">Meet admin settings</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="meet">
+          <summary><span class="caret">▸</span><span class="sym">Can't record a meeting / no record button</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Recording not enabled by admin, user on an unsupported edition, using mobile, or Drive is full.</dd>
+            <dt>Fix</dt><dd>Admin console → Meet → Meet video settings → Recording → "Let people record their meetings"; use a computer; ensure the organizer's Drive has space.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/7557052" target="_blank" rel="noopener">turn on recording</a> · <a href="https://support.google.com/meet/answer/10619995" target="_blank" rel="noopener">troubleshoot</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="meet">
+          <summary><span class="caret">▸</span><span class="sym">Calendar invites not reaching external guests / free-busy not visible</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>External sharing for Calendar is restricted, or guest-invite permissions are limited by policy.</dd>
+            <dt>Fix</dt><dd>Admin console → Apps → Google Calendar → Sharing settings → set external sharing (free/busy or full details) and allow inviting external guests.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/meet/answer/7290456" target="_blank" rel="noopener">known Meet issues</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- MDM -->
+      <div class="cat-group">
+        <h2>📱 Mobile device management (MDM)</h2>
+
+        <details class="issue" data-cat="mdm">
+          <summary><span class="caret">▸</span><span class="sym">Users prompted to enroll device / can't access work mail on mobile</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Basic or Advanced mobile management is on, requiring enrollment/screen lock before account sync.</dd>
+            <dt>Fix</dt><dd>Choose Basic (screen lock + remote account wipe, no agent) vs. Advanced (full policies, app management, requires the Google Device Policy app and, for iOS, an Apple push cert). Set in Devices → Mobile &amp; endpoints → Settings → Universal.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/7400753" target="_blank" rel="noopener">Basic</a> · <a href="https://support.google.com/a/answer/7396025" target="_blank" rel="noopener">Advanced</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="mdm">
+          <summary><span class="caret">▸</span><span class="sym">iOS devices can't be managed / "Advanced" option greyed out</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>No Apple Push Notification service (APNs) certificate configured.</dd>
+            <dt>Fix</dt><dd>Create/renew the Apple push certificate in the Admin console (renew annually — expiry breaks iOS management), then enable Advanced management.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/7576736" target="_blank" rel="noopener">compare features</a> · <a href="https://support.google.com/a/answer/1734200" target="_blank" rel="noopener">endpoint overview</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- BILLING -->
+      <div class="cat-group">
+        <h2>💳 Billing &amp; subscriptions</h2>
+
+        <details class="issue" data-cat="billing">
+          <summary><span class="caret">▸</span><span class="sym">Charged more than expected / can't reduce licenses mid-term</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>On the Annual/Fixed-Term plan you commit to a license count for the term; reductions only apply at renewal. The Flexible plan bills monthly and prorates.</dd>
+            <dt>Fix</dt><dd>To lower the count on Annual, set "Auto-renew with fewer licenses" before renewal; for month-to-month flexibility switch to the Flexible plan (Billing → Subscriptions).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/1247360" target="_blank" rel="noopener">compare plans</a> · <a href="https://support.google.com/a/answer/6154359" target="_blank" rel="noopener">reduce licenses</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="billing">
+          <summary><span class="caret">▸</span><span class="sym">Need more seats immediately</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Ran out of purchased licenses on either plan.</dd>
+            <dt>Fix</dt><dd>Billing → Subscriptions → your plan → add/purchase licenses (Annual lets you add anytime; billed prorated for the remaining term).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/33387" target="_blank" rel="noopener">purchase more</a> · <a href="https://support.google.com/a/answer/1230658" target="_blank" rel="noopener">understand bills</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="billing">
+          <summary><span class="caret">▸</span><span class="sym">Free trial ended / subscription suspended for non-payment</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>No payment method added before trial end, or a failed charge.</dd>
+            <dt>Fix</dt><dd>Billing → set up/update the payment method; resolve the outstanding charge to reactivate. Data is retained for a grace period before deletion.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/2633430" target="_blank" rel="noopener">set up billing</a> · <a href="https://support.google.com/a/answer/1247362" target="_blank" rel="noopener">flexible plan</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- GROUPS / CHAT -->
+      <div class="cat-group">
+        <h2>💬 Groups &amp; Chat</h2>
+
+        <details class="issue" data-cat="groups">
+          <summary><span class="caret">▸</span><span class="sym">Group isn't receiving external email</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The group's <em>Who can post</em> permission excludes people outside the org, or "Allow external members / posting from the web" is off.</dd>
+            <dt>Fix</dt><dd>In the group's settings (Groups for Business / Admin console → Directory → Groups), set <em>Who can post</em> to include "Anyone on the web" (or specific external senders) and enable external posting. Watch spam exposure.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/167430" target="_blank" rel="noopener">group access settings</a> · <a href="https://support.google.com/a/answer/33329" target="_blank" rel="noopener">manage groups</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="groups">
+          <summary><span class="caret">▸</span><span class="sym">Members can't post / messages held for moderation</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Posting permissions are too tight, or message moderation is set to hold everything.</dd>
+            <dt>Fix</dt><dd>Adjust <em>Who can post</em> and the moderation policy in the group's settings; approve pending messages from the moderation queue.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/167430" target="_blank" rel="noopener">a/answer/167430</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="groups">
+          <summary><span class="caret">▸</span><span class="sym">Can't chat/Space with people at another company</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>External chat is off, or the other org restricts it — external Chat requires both sides to allow it.</dd>
+            <dt>Fix</dt><dd>Admin console → Apps → Google Chat → configure external chat (allow all domains or allowlist trusted ones). Both organizations must permit it.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/9540647" target="_blank" rel="noopener">external chat settings</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- VAULT / RETENTION -->
+      <div class="cat-group">
+        <h2>🗄️ Vault &amp; retention</h2>
+
+        <details class="issue" data-cat="vault">
+          <summary><span class="caret">▸</span><span class="sym">A deleted user's mail/Drive data disappeared before it could be exported</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Deleting an account purges its data after a short recovery window unless a Vault hold or retention rule preserved it.</dd>
+            <dt>Fix</dt><dd>Place a <strong>Vault hold</strong> (or transfer the data / keep the account suspended) <em>before</em> deleting. Recently deleted users can sometimes be restored within ~20 days (Directory → Users → Recently deleted).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/vault/answer/2462365" target="_blank" rel="noopener">Vault holds</a> · <a href="https://support.google.com/a/answer/7011203" target="_blank" rel="noopener">restore a deleted user</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="vault">
+          <summary><span class="caret">▸</span><span class="sym">Retention rule is deleting mail users still need</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>A default/custom Vault retention rule expires data after N days; without a longer hold, messages get purged on schedule.</dd>
+            <dt>Fix</dt><dd>Review Vault → Retention; a <em>hold</em> always overrides a retention rule (data is kept while held). Set custom rules per OU/date carefully — expiration is destructive.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/vault/answer/2990828" target="_blank" rel="noopener">retention overview</a> · <a href="https://support.google.com/vault/answer/2990828" target="_blank" rel="noopener">holds vs retention</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- DIRECTORY SYNC -->
+      <div class="cat-group">
+        <h2>🔗 Directory sync &amp; provisioning</h2>
+
+        <details class="issue" data-cat="sync">
+          <summary><span class="caret">▸</span><span class="sym">Google Cloud Directory Sync (GCDS) isn't creating/updating users</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>LDAP search rules don't match the intended OU, exclusion rules are too broad, or the sync ran in simulate-only mode.</dd>
+            <dt>Fix</dt><dd>Run a simulation and read the proposed changes first; fix the LDAP org-unit/search filters; confirm you're not in simulate mode for the real run; check the GCDS logs for the skipped-user reason.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/106368" target="_blank" rel="noopener">about GCDS</a> · <a href="https://support.google.com/a/answer/9187085" target="_blank" rel="noopener">troubleshoot GCDS</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="sync">
+          <summary><span class="caret">▸</span><span class="sym">Sync accidentally suspended/deleted a batch of users</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>A source-directory change (or a wrong filter) made GCDS think users no longer exist, triggering suspend/delete on the next sync.</dd>
+            <dt>Fix</dt><dd>Set deletion policy to <em>suspend</em> (not delete) and cap the number of deletions per sync as a safety limit; always review the simulation diff before applying large changes.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://support.google.com/a/answer/9187085" target="_blank" rel="noopener">GCDS troubleshooting</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <div class="callout tip">
+        <strong>Beginner survival kit:</strong> keep <strong>2+ super admins</strong> with recovery email/phone before enforcing any security policy · DNS changes take <strong>up to 48–72 hours</strong> — add <strong>DKIM/SPF before DMARC</strong> · use <strong>OUs for policies, Groups for access/mail</strong> · store team files in <strong>shared drives</strong> to avoid orphaned files · place a <strong>Vault hold before deleting</strong> anyone whose data matters.
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cols">
+        <div><strong>GoogleHelpit</strong> — your nerdy Google IT helper.</div>
+        <div>
+          <a href="index.html">Home</a> ·
+          <a href="gcp-troubleshooting.html">GCP Fixes</a> ·
+          <a href="learn.html">Learn</a> ·
+          <a href="certifications.html">Certs</a> ·
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

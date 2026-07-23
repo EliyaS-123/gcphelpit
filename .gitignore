@@ -1,0 +1,9 @@
+# Nested private repos — never publish
+/gcphelpit/
+/unmeet-agent/
+
+# Internal project notes — keep private
+/docs/
+
+# OS cruft
+.DS_Store

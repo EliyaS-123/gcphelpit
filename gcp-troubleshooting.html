@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GCP Troubleshooting — GoogleHelpit</title>
+  <meta name="description" content="Common Google Cloud Platform errors and how to fix them: billing, IAM permissions, quotas, SSH, Cloud Run, GKE and more. Independent community guide.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="logo" src="assets/img/logo.svg" alt="">
+        <span>Google<span class="tag">Helpit</span><span class="cursor">_</span></span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="gcp-troubleshooting.html" class="active">GCP Fixes</a>
+        <a href="workspace-troubleshooting.html">Workspace Fixes</a>
+        <a href="tutorials.html">Tutorials</a>
+        <a href="tool.html">Tool</a>
+        <a href="learn.html">Learn</a>
+        <a href="certifications.html">Certs</a>
+        <a href="about.html">About</a>
+      </nav>
+      <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section style="padding-bottom:10px">
+      <div class="prompt" style="font-family:var(--mono);color:var(--accent);font-size:.9rem">$ gcloud troubleshoot</div>
+      <h1 class="section-title" style="font-size:1.9rem"><span class="hash">#</span> GCP Troubleshooting</h1>
+      <p class="section-sub">The errors people actually hit on Google Cloud — symptom → cause → fix → official docs. Search or filter by area, click a card to expand.</p>
+
+      <div class="filter-bar">
+        <input id="filter-box" class="filter-box" type="search" placeholder="Filter fixes… e.g. 'PERMISSION_DENIED', 'PORT', 'quota'" autocomplete="off" aria-label="Filter GCP fixes">
+      </div>
+      <div class="chips">
+        <span class="chip active" data-cat="all">all</span>
+        <span class="chip" data-cat="billing">billing</span>
+        <span class="chip" data-cat="iam">iam / permissions</span>
+        <span class="chip" data-cat="quotas">quotas</span>
+        <span class="chip" data-cat="apis">apis</span>
+        <span class="chip" data-cat="auth">auth / gcloud</span>
+        <span class="chip" data-cat="compute">compute</span>
+        <span class="chip" data-cat="networking">networking</span>
+        <span class="chip" data-cat="storage">storage</span>
+        <span class="chip" data-cat="serverless">serverless</span>
+        <span class="chip" data-cat="gke">gke</span>
+        <span class="chip" data-cat="bigquery">bigquery</span>
+        <span class="chip" data-cat="database">databases</span>
+        <span class="chip" data-cat="logging">logging / monitoring</span>
+        <span class="chip" data-cat="terraform">terraform / iac</span>
+      </div>
+      <div class="no-results">// no matching fixes — try a different term or category.</div>
+
+      <!-- ============ BILLING ============ -->
+      <div class="cat-group">
+        <h2>💸 Billing &amp; cost surprises</h2>
+
+        <details class="issue" data-cat="billing">
+          <summary><span class="caret">▸</span><span class="sym">"This API method requires billing to be enabled" / project has no billing account</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The project isn't linked to an active Cloud Billing account, so paid services (and even some API calls) are blocked.</dd>
+            <dt>Fix</dt><dd>Console → Billing → <em>Link a billing account</em>, or run:
+              <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud billing projects link PROJECT_ID --billing-account=XXXXXX-XXXXXX-XXXXXX</code></div>
+              Verify with <code>gcloud billing projects describe PROJECT_ID</code>.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/billing/docs/how-to/modify-project" target="_blank" rel="noopener">cloud.google.com/billing/docs/how-to/modify-project</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="billing">
+          <summary><span class="caret">▸</span><span class="sym">Unexpected charges / bill much higher than expected</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Always-on resources — idle VMs, static IPs on stopped VMs, load balancers, provisioned disks, NAT gateways, logging — keep billing even when "not used."</dd>
+            <dt>Fix</dt><dd>Billing → Reports to find the top service/SKU; delete or stop idle resources; release unused static IPs (charged when unattached); act on cost recommendations in the Recommender.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/billing/docs/how-to/reports" target="_blank" rel="noopener">cloud.google.com/billing/docs/how-to/reports</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="billing">
+          <summary><span class="caret">▸</span><span class="sym">A budget was set but spending wasn't capped</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd><strong>Budgets are alerting only</strong> — they never stop usage or billing automatically.</dd>
+            <dt>Fix</dt><dd>Create budgets with threshold alerts (Billing → Budgets &amp; alerts). For a true hard stop, wire the budget's Pub/Sub notification to a Cloud Function that disables billing.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/billing/docs/how-to/budgets" target="_blank" rel="noopener">budgets</a> · <a href="https://cloud.google.com/billing/docs/how-to/disable-billing-with-notifications" target="_blank" rel="noopener">disable billing with notifications</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="billing">
+          <summary><span class="caret">▸</span><span class="sym">Free-tier / $300 trial confusion (charged after trial or over limits)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The $300 credit expires after 90 days; "Always Free" tiers have monthly caps that don't roll over and exclude many regions/sizes.</dd>
+            <dt>Fix</dt><dd>Check per-product free limits before deploying; keep VMs to the eligible <code>e2-micro</code> region/size; monitor the credit balance in Billing.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/free/docs/free-cloud-features" target="_blank" rel="noopener">cloud.google.com/free/docs/free-cloud-features</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="billing">
+          <summary><span class="caret">▸</span><span class="sym">Budget alert emails not arriving</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Alerts default to Billing Account Admins/Users; custom recipients or Pub/Sub/Monitoring channels weren't configured.</dd>
+            <dt>Fix</dt><dd>Edit the budget → <em>Manage notifications</em> → add email channels via Cloud Monitoring, or add members with a Billing role.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/billing/docs/how-to/budgets" target="_blank" rel="noopener">cloud.google.com/billing/docs/how-to/budgets</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ IAM ============ -->
+      <div class="cat-group">
+        <h2>🔐 IAM &amp; permissions</h2>
+
+        <details class="issue" data-cat="iam">
+          <summary><span class="caret">▸</span><span class="sym">"PERMISSION_DENIED: &lt;email&gt; does not have &lt;service&gt;.&lt;resource&gt;.&lt;verb&gt; access"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The principal lacks a role containing that specific permission (or a deny policy blocks it).</dd>
+            <dt>Fix</dt><dd>Read the exact missing permission from the error, then grant a role that includes it:
+              <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member=user:EMAIL --role=roles/ROLE</code></div>
+              Use the suggested-roles list Google prints in the error.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/iam/docs/permission-error-messages" target="_blank" rel="noopener">iam/docs/permission-error-messages</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="iam">
+          <summary><span class="caret">▸</span><span class="sym">"The caller does not have permission"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Same as above but often on the <em>service agent</em> or a parent resource (folder/org), or you're authenticated as the wrong identity.</dd>
+            <dt>Fix</dt><dd>Confirm the active identity with <code>gcloud auth list</code>, then use the Policy Troubleshooter to see which policy grants/denies access.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/iam/docs/troubleshooting-access" target="_blank" rel="noopener">iam/docs/troubleshooting-access</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="iam">
+          <summary><span class="caret">▸</span><span class="sym">Confused about roles vs. permissions</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>You can't grant a single permission directly — permissions are bundled into roles (basic, predefined, custom).</dd>
+            <dt>Fix</dt><dd>Prefer predefined roles scoped to the service; create a custom role only if none fits. Grant at the lowest resource level needed.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/iam/docs/understanding-roles" target="_blank" rel="noopener">iam/docs/understanding-roles</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="iam">
+          <summary><span class="caret">▸</span><span class="sym">Service account "does not have permission" when running code</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The runtime service account (default Compute/Cloud Run SA) lacks roles for the resources the code touches.</dd>
+            <dt>Fix</dt><dd>Identify the SA the workload runs as and grant it the needed role(s). Prefer attaching a dedicated least-privilege SA over the default one.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/iam/docs/best-practices-service-accounts" target="_blank" rel="noopener">best-practices-service-accounts</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="iam">
+          <summary><span class="caret">▸</span><span class="sym">Action blocked by an Organization Policy (can't create SA keys / allow public access / share externally)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>An org policy constraint (e.g. <code>iam.disableServiceAccountKeyCreation</code>, <code>iam.allowedPolicyMemberDomains</code>, <code>storage.publicAccessPrevention</code>) overrides IAM.</dd>
+            <dt>Fix</dt><dd>An Org Policy Admin must adjust/override the constraint at project/folder level, or use the allowed alternative (e.g. Workload Identity instead of SA keys).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/resource-manager/docs/organization-policy/using-constraints" target="_blank" rel="noopener">organization-policy/using-constraints</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="iam">
+          <summary><span class="caret">▸</span><span class="sym">IAM change "didn't work" immediately</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>IAM policy changes are usually fast but can take up to ~7 minutes to propagate.</dd>
+            <dt>Fix</dt><dd>Wait a few minutes and retry before deeper debugging.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/iam/docs/access-change-propagation" target="_blank" rel="noopener">iam/docs/access-change-propagation</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ QUOTAS ============ -->
+      <div class="cat-group">
+        <h2>📊 Quotas &amp; limits</h2>
+
+        <details class="issue" data-cat="quotas">
+          <summary><span class="caret">▸</span><span class="sym">"Quota exceeded" / RESOURCE_EXHAUSTED (CPUs, IN_USE_ADDRESSES, …)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>You hit a per-project, per-region quota — many default low, especially for new/trial accounts.</dd>
+            <dt>Fix</dt><dd>IAM &amp; Admin → Quotas &amp; System Limits → filter by the service/metric → select → <em>Edit quotas</em> to request an increase. Deleting/stopping resources frees region-scoped quota immediately.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/docs/quotas/view-manage" target="_blank" rel="noopener">quotas/view-manage</a> · <a href="https://cloud.google.com/docs/quotas/troubleshoot" target="_blank" rel="noopener">troubleshoot</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="quotas">
+          <summary><span class="caret">▸</span><span class="sym">Quota increase denied / trial account can't raise quota</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Free-trial billing accounts have restricted quotas (e.g. 8 vCPUs) and limited increase eligibility.</dd>
+            <dt>Fix</dt><dd>Upgrade to a paid/self-serve billing account, then re-request the increase.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/docs/quotas/troubleshoot" target="_blank" rel="noopener">cloud.google.com/docs/quotas/troubleshoot</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="quotas">
+          <summary><span class="caret">▸</span><span class="sym">Surprise quota hit at scale</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>No proactive monitoring of usage vs. limit.</dd>
+            <dt>Fix</dt><dd>Set up Cloud Quotas alerts to notify at a % of the limit.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/docs/quotas/set-up-quota-alerts" target="_blank" rel="noopener">quotas/set-up-quota-alerts</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ APIS ============ -->
+      <div class="cat-group">
+        <h2>🔌 APIs not enabled</h2>
+
+        <details class="issue" data-cat="apis">
+          <summary><span class="caret">▸</span><span class="sym">"API [name] has not been used in project N before or it is disabled"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The required API isn't enabled in the project (each API must be enabled once).</dd>
+            <dt>Fix</dt><dd>Click the URL in the error, or run:
+              <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud services enable SERVICE.googleapis.com</code></div>
+              Wait a few minutes for propagation, then retry.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/service-usage/docs/enable-disable" target="_blank" rel="noopener">service-usage/docs/enable-disable</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="apis">
+          <summary><span class="caret">▸</span><span class="sym">Can't enable an API ("permission denied to enable service")</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>You lack <code>serviceusage.services.enable</code> (Service Usage Admin).</dd>
+            <dt>Fix</dt><dd>Get granted <code>roles/serviceusage.serviceUsageAdmin</code>, or ask an admin to enable it.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/service-usage/docs/access-control" target="_blank" rel="noopener">service-usage/docs/access-control</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ AUTH ============ -->
+      <div class="cat-group">
+        <h2>🔑 Authentication &amp; gcloud CLI</h2>
+
+        <details class="issue" data-cat="auth">
+          <summary><span class="caret">▸</span><span class="sym">Commands run against the wrong project</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The gcloud <code>core/project</code> property points to a different project than intended.</dd>
+            <dt>Fix</dt><dd>Check and set it:
+              <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud config get-value project
+gcloud config set project PROJECT_ID</code></div>
+              Or add <code>--project=</code> per command. Use named configurations for multiple projects.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/sdk/docs/configurations" target="_blank" rel="noopener">sdk/docs/configurations</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="auth">
+          <summary><span class="caret">▸</span><span class="sym">"Could not automatically determine credentials" (ADC missing)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Client libraries use Application Default Credentials, which aren't set up locally.</dd>
+            <dt>Fix</dt><dd>Run:
+              <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud auth application-default login</code></div>
+              This is separate from <code>gcloud auth login</code> (which only authenticates the CLI). Set a quota project if prompted.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/docs/authentication/provide-credentials-adc" target="_blank" rel="noopener">authentication/provide-credentials-adc</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="auth">
+          <summary><span class="caret">▸</span><span class="sym">Did "gcloud auth login" but libraries still fail</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd><code>gcloud auth login</code> authenticates the CLI only — not the ADC used by SDKs.</dd>
+            <dt>Fix</dt><dd>Also run <code>gcloud auth application-default login</code>. Remember the two are different.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/docs/authentication/troubleshoot-adc" target="_blank" rel="noopener">authentication/troubleshoot-adc</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="auth">
+          <summary><span class="caret">▸</span><span class="sym">Reauthentication / expired credentials on the CLI</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Tokens expired, or the org requires periodic reauth.</dd>
+            <dt>Fix</dt><dd>Run <code>gcloud auth login</code> again. For automation, use <code>gcloud auth activate-service-account</code> or attached service accounts.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/sdk/gcloud/reference/auth/login" target="_blank" rel="noopener">sdk/gcloud/reference/auth/login</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="auth">
+          <summary><span class="caret">▸</span><span class="sym">Service-account-key security warnings / leaked keys</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Long-lived JSON SA keys are risky and often blocked by org policy.</dd>
+            <dt>Fix</dt><dd>Prefer Workload Identity Federation, attached service accounts, or impersonation instead of downloaded keys.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/iam/docs/best-practices-for-managing-service-account-keys" target="_blank" rel="noopener">best-practices-for-managing-service-account-keys</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ COMPUTE ============ -->
+      <div class="cat-group">
+        <h2>🖥️ Compute Engine</h2>
+
+        <details class="issue" data-cat="compute">
+          <summary><span class="caret">▸</span><span class="sym">Can't SSH into a Linux VM (timeout / connection refused / permission denied)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Missing firewall rule for TCP 22, SSH keys not propagated, guest environment not running, or OS Login misconfig.</dd>
+            <dt>Fix</dt><dd>Try the console SSH-in-browser first; ensure an ingress rule allows <code>tcp:22</code> from your IP (or <code>35.235.240.0/20</code> for IAP); run the built-in SSH troubleshooting tool; check the serial console.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/compute/docs/troubleshooting/troubleshooting-ssh-errors" target="_blank" rel="noopener">troubleshooting-ssh-errors</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="compute">
+          <summary><span class="caret">▸</span><span class="sym">"Permission denied (publickey)" via terminal SSH</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Key mismatch, or OS Login is enabled but your account lacks the OS Login role.</dd>
+            <dt>Fix</dt><dd>Grant <code>roles/compute.osLogin</code>; or add your SSH key to instance/project metadata if not using OS Login.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/compute/docs/troubleshooting/troubleshoot-os-login" target="_blank" rel="noopener">troubleshoot-os-login</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="compute">
+          <summary><span class="caret">▸</span><span class="sym">VM won't start / stuck / "resources not available in zone"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Zonal stockout for the machine type, or quota exhausted.</dd>
+            <dt>Fix</dt><dd>Try another zone/region or a different machine type; check quota; review the VM's serial console for boot errors.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/compute/docs/troubleshooting/troubleshooting-using-serial-console" target="_blank" rel="noopener">troubleshooting-using-serial-console</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="compute">
+          <summary><span class="caret">▸</span><span class="sym">Can't reach the VM's web app from the internet</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>No external IP, or no firewall rule opening the app port (80/443).</dd>
+            <dt>Fix</dt><dd>Assign an external IP (or use a load balancer); add an ingress <code>allow</code> rule for the port and target tags/service account.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/firewall/docs/using-firewalls" target="_blank" rel="noopener">firewall/docs/using-firewalls</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="compute">
+          <summary><span class="caret">▸</span><span class="sym">Lost external IP after stopping/starting the VM</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Ephemeral external IPs are released on stop.</dd>
+            <dt>Fix</dt><dd>Promote/reserve a static external IP and attach it. Note: reserved-but-unattached IPs are billed.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address" target="_blank" rel="noopener">reserve-static-external-ip-address</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="compute">
+          <summary><span class="caret">▸</span><span class="sym">"No space left on device" / disk full on a running VM</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The boot/data disk filled up; unlike some clouds, resizing the disk in the console does <em>not</em> auto-grow the filesystem.</dd>
+            <dt>Fix</dt><dd>Resize the disk (Compute → Disks → Edit → increase size — this is online), then grow the partition/filesystem inside the guest (<code>growpart</code> + <code>resize2fs</code>/<code>xfs_growfs</code>). Clean logs/caches to buy time.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/compute/docs/disks/resize-persistent-disk" target="_blank" rel="noopener">disks/resize-persistent-disk</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="compute">
+          <summary><span class="caret">▸</span><span class="sym">Metadata / startup script changes didn't take effect</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Startup scripts run at boot; editing metadata on a running VM doesn't re-run them.</dd>
+            <dt>Fix</dt><dd>Reset/reboot the VM to re-run the startup script, or run it manually. Check execution in the serial console output.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/compute/docs/instances/startup-scripts/linux" target="_blank" rel="noopener">instances/startup-scripts/linux</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ NETWORKING ============ -->
+      <div class="cat-group">
+        <h2>🌐 Networking / VPC</h2>
+
+        <details class="issue" data-cat="networking">
+          <summary><span class="caret">▸</span><span class="sym">"Connection timed out" / "connection refused" between resources</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Firewall rule missing/misordered, wrong target tags, service not listening, or wrong port.</dd>
+            <dt>Fix</dt><dd>Confirm an ingress <code>allow</code> rule matches source range, protocol, and port and applies to the target; verify the service listens on that port/interface. Use Connectivity Tests to pinpoint.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/vpc/docs/firewalls" target="_blank" rel="noopener">vpc/docs/firewalls</a> · <a href="https://cloud.google.com/network-intelligence-center/docs/connectivity-tests/how-to/running-connectivity-tests" target="_blank" rel="noopener">connectivity tests</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="networking">
+          <summary><span class="caret">▸</span><span class="sym">Private VM (no external IP) can't reach the internet (apt/pip timeouts)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>VMs without external IPs need Cloud NAT for outbound internet; egress may also be firewalled.</dd>
+            <dt>Fix</dt><dd>Create a Cloud Router + Cloud NAT gateway for the subnet's region; ensure no egress <code>deny</code> rule blocks traffic (egress rules apply before NAT).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/nat/docs/gce-example" target="_blank" rel="noopener">nat/docs/gce-example</a> · <a href="https://cloud.google.com/nat/docs/troubleshooting" target="_blank" rel="noopener">troubleshooting</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="networking">
+          <summary><span class="caret">▸</span><span class="sym">VPC Peering set up but resources still can't talk</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Peering isn't transitive, subnet CIDRs overlap, or firewall rules don't allow the peer range; both sides must create the peering.</dd>
+            <dt>Fix</dt><dd>Create peering on both VPCs, ensure non-overlapping subnets, and add firewall rules allowing the peer's ranges.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/vpc/docs/vpc-peering" target="_blank" rel="noopener">vpc/docs/vpc-peering</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="networking">
+          <summary><span class="caret">▸</span><span class="sym">Default firewall behavior confusion</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>VPC default is deny ingress / allow egress; the "default" network's implied allow rules may not exist on custom VPCs.</dd>
+            <dt>Fix</dt><dd>Explicitly create needed allow rules (allow-ssh, allow-internal, allow-http). Use firewall rule logging to debug.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/firewall/docs/firewalls" target="_blank" rel="noopener">firewall/docs/firewalls</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ STORAGE ============ -->
+      <div class="cat-group">
+        <h2>🪣 Cloud Storage</h2>
+
+        <details class="issue" data-cat="storage">
+          <summary><span class="caret">▸</span><span class="sym">Can't make a bucket/object public ("Public access prevention is enforced")</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Public Access Prevention is on (bucket, or inherited from org policy), blocking <code>allUsers</code>/<code>allAuthenticatedUsers</code> grants.</dd>
+            <dt>Fix</dt><dd>If policy allows, disable PAP on the bucket, then grant <code>roles/storage.objectViewer</code> to <code>allUsers</code>. If enforced by org policy, an admin must change it.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/storage/docs/public-access-prevention" target="_blank" rel="noopener">public-access-prevention</a> · <a href="https://cloud.google.com/storage/docs/access-control/making-data-public" target="_blank" rel="noopener">making-data-public</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="storage">
+          <summary><span class="caret">▸</span><span class="sym">"AccessDenied" / 403 on uploads or reads</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Principal lacks the right Storage role, or the bucket uses uniform bucket-level access (ACLs disabled).</dd>
+            <dt>Fix</dt><dd>Grant <code>roles/storage.objectAdmin</code>/<code>objectViewer</code> at bucket level; with uniform access, use IAM (not object ACLs).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/storage/docs/access-control/iam" target="_blank" rel="noopener">access-control/iam</a> · <a href="https://cloud.google.com/storage/docs/uniform-bucket-level-access" target="_blank" rel="noopener">uniform-bucket-level-access</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="storage">
+          <summary><span class="caret">▸</span><span class="sym">Uploads failing / general 4xx–5xx from Storage</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Wrong bucket name, missing permission, or CORS/precondition issues for browser uploads.</dd>
+            <dt>Fix</dt><dd>Follow the Storage troubleshooting matrix; for browser uploads, configure CORS on the bucket.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/storage/docs/troubleshooting" target="_blank" rel="noopener">storage/docs/troubleshooting</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="storage">
+          <summary><span class="caret">▸</span><span class="sym">Accidental public / exposed bucket</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Legacy ACLs or <code>allUsers</code> grants left data open.</dd>
+            <dt>Fix</dt><dd>Enable uniform bucket-level access + public access prevention; audit with the IAM policy analyzer.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/storage/docs/using-public-access-prevention" target="_blank" rel="noopener">using-public-access-prevention</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ SERVERLESS ============ -->
+      <div class="cat-group">
+        <h2>⚡ Serverless — Cloud Run, Functions, App Engine</h2>
+
+        <details class="issue" data-cat="serverless">
+          <summary><span class="caret">▸</span><span class="sym">Cloud Run: "container failed to start and listen on the port defined by the PORT environment variable"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The app doesn't listen on <code>0.0.0.0:$PORT</code> (hardcoded port, bound to 127.0.0.1, or startup crash/timeout).</dd>
+            <dt>Fix</dt><dd>Read <code>PORT</code> from env and bind to <code>0.0.0.0</code>; test the image locally; check Cloud Logging for the startup stack trace; raise the startup timeout if init is slow.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/run/docs/troubleshooting" target="_blank" rel="noopener">run/docs/troubleshooting</a> · <a href="https://cloud.google.com/run/docs/container-contract" target="_blank" rel="noopener">container-contract</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="serverless">
+          <summary><span class="caret">▸</span><span class="sym">Cloud Run / Functions: cold starts / slow first request</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>New instances spin up on demand; heavy init or large images increase latency.</dd>
+            <dt>Fix</dt><dd>Set <code>--min-instances</code> to keep instances warm; slim the image; move heavy init to global scope. (Min instances incur cost.)</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/run/docs/configuring/min-instances" target="_blank" rel="noopener">configuring/min-instances</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="serverless">
+          <summary><span class="caret">▸</span><span class="sym">Cloud Run: 403 "Forbidden" when calling the service</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Service requires authentication (default) and the caller isn't an invoker.</dd>
+            <dt>Fix</dt><dd>For public access, <code>--allow-unauthenticated</code> (grants <code>roles/run.invoker</code> to <code>allUsers</code>); for service-to-service, grant the calling SA <code>roles/run.invoker</code> and send an ID token.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/run/docs/authenticating/public" target="_blank" rel="noopener">authenticating/public</a> · <a href="https://cloud.google.com/run/docs/authenticating/service-to-service" target="_blank" rel="noopener">service-to-service</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="serverless">
+          <summary><span class="caret">▸</span><span class="sym">Cloud Functions: deploy fails at build (dependency or entry-point error)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Missing/incorrect entry point name, dependency install failure, or wrong runtime.</dd>
+            <dt>Fix</dt><dd>Match <code>--entry-point</code> to the exported function name; verify the dependency manifest; read the Cloud Build logs linked in the error.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/functions/docs/troubleshooting" target="_blank" rel="noopener">functions/docs/troubleshooting</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="serverless">
+          <summary><span class="caret">▸</span><span class="sym">Deploy: "Build failed / permission denied" on Cloud Build or Artifact Registry</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The Cloud Build or default compute service agent lacks required roles, or the Cloud Build/Artifact Registry APIs aren't enabled.</dd>
+            <dt>Fix</dt><dd>Enable Cloud Build + Artifact Registry APIs; ensure the build SA has needed roles (Google usually auto-grants; re-grant if removed).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/build/docs/troubleshooting" target="_blank" rel="noopener">build/docs/troubleshooting</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="serverless">
+          <summary><span class="caret">▸</span><span class="sym">App Engine: `gcloud app deploy` fails (region locked / app not created)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>An App Engine app must be created once per project and its region can't be changed later.</dd>
+            <dt>Fix</dt><dd>Run <code>gcloud app create --region=REGION</code> before the first deploy; pick the region carefully (permanent).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/appengine/docs/standard/managing-projects-apps-billing/creating-project" target="_blank" rel="noopener">appengine/docs/…/creating-project</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="serverless">
+          <summary><span class="caret">▸</span><span class="sym">App Engine: 502 / scaling / startup errors after deploy</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>App not listening on <code>$PORT</code>/<code>8080</code>, failing health checks, or missing runtime config.</dd>
+            <dt>Fix</dt><dd>Bind to the provided port, verify <code>app.yaml</code>, and check Logs Explorer for the failing request.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/appengine/docs/standard/troubleshooting" target="_blank" rel="noopener">appengine/docs/standard/troubleshooting</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ GKE ============ -->
+      <div class="cat-group">
+        <h2>☸️ Kubernetes / GKE</h2>
+
+        <details class="issue" data-cat="gke">
+          <summary><span class="caret">▸</span><span class="sym">Pod stuck in ImagePullBackOff / ErrImagePull</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Wrong image name/tag, or the node/cluster SA can't authenticate to the registry (Artifact Registry).</dd>
+            <dt>Fix</dt><dd>Verify the image path and tag; grant the node service account <code>roles/artifactregistry.reader</code>; confirm the image exists in the region.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/kubernetes-engine/docs/troubleshooting/image-pulls" target="_blank" rel="noopener">troubleshooting/image-pulls</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gke">
+          <summary><span class="caret">▸</span><span class="sym">Pod in CrashLoopBackOff</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The container starts then exits repeatedly (app error, bad command, missing config/secret, failing liveness probe).</dd>
+            <dt>Fix</dt><dd>Inspect the crash:
+              <div class="codeblock"><button class="copy-btn">copy</button><code>kubectl logs POD --previous</code></div>
+              Fix the command/env/probe; check the exit code.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/kubernetes-engine/docs/troubleshooting/crashloopbackoff-events" target="_blank" rel="noopener">troubleshooting/crashloopbackoff-events</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gke">
+          <summary><span class="caret">▸</span><span class="sym">Pod Pending — "Insufficient cpu/memory" / won't schedule</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>No node has enough allocatable resources for the pod's requests, or the node pool is too small.</dd>
+            <dt>Fix</dt><dd>Lower resource requests, scale/enable the node pool, or turn on cluster autoscaling.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/kubernetes-engine/docs/troubleshooting/deployed-workloads" target="_blank" rel="noopener">troubleshooting/deployed-workloads</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gke">
+          <summary><span class="caret">▸</span><span class="sym">kubectl can't connect / "You must be logged in" after cluster create</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>kubeconfig credentials not fetched, or missing the gke-gcloud-auth-plugin.</dd>
+            <dt>Fix</dt><dd>Fetch credentials and install the plugin:
+              <div class="codeblock"><button class="copy-btn">copy</button><code>gcloud container clusters get-credentials CLUSTER --region REGION</code></div></dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl" target="_blank" rel="noopener">how-to/cluster-access-for-kubectl</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gke">
+          <summary><span class="caret">▸</span><span class="sym">Service LoadBalancer stuck in &lt;pending&gt; / no external IP</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>LB provisioning in progress, external-IP quota, or annotation/subnet misconfig.</dd>
+            <dt>Fix</dt><dd>Wait a few minutes; check <code>IN_USE_ADDRESSES</code> quota and events with <code>kubectl describe svc</code>.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer" target="_blank" rel="noopener">concepts/service-load-balancer</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="gke">
+          <summary><span class="caret">▸</span><span class="sym">403 / permission denied creating or managing GKE</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Missing <code>roles/container.admin</code>/<code>developer</code>, or the GKE API/service agent isn't set up.</dd>
+            <dt>Fix</dt><dd>Enable the Kubernetes Engine API; grant appropriate container roles.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/iam" target="_blank" rel="noopener">kubernetes-engine/docs/how-to/iam</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ BIGQUERY ============ -->
+      <div class="cat-group">
+        <h2>🗄️ BigQuery</h2>
+
+        <details class="issue" data-cat="bigquery">
+          <summary><span class="caret">▸</span><span class="sym">"Not found: Table/Dataset" even though it exists</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Wrong project/dataset qualification, or a region mismatch — you can't query a dataset in <code>US</code> from a job running in <code>EU</code>.</dd>
+            <dt>Fix</dt><dd>Fully-qualify as <code>`project.dataset.table`</code>; confirm the dataset's location and run the job in the same region; check for typos/case (dataset IDs are case-sensitive).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/bigquery/docs/error-messages" target="_blank" rel="noopener">bigquery/docs/error-messages</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="bigquery">
+          <summary><span class="caret">▸</span><span class="sym">Query scanned way more data than expected / surprise cost</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>On-demand pricing bills by bytes <em>scanned</em>. <code>SELECT *</code>, no partition filter, or querying a huge table scans everything.</dd>
+            <dt>Fix</dt><dd>Select only needed columns; filter on the partition column; check the estimate in the UI (dry-run bytes) before running; set a <em>Maximum bytes billed</em> limit on the query to hard-cap it.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/bigquery/docs/best-practices-costs" target="_blank" rel="noopener">bigquery/docs/best-practices-costs</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="bigquery">
+          <summary><span class="caret">▸</span><span class="sym">"Access Denied: BigQuery ... permission bigquery.jobs.create"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>To run any query you need job-creation permission in the <em>billing</em> project, plus data access on the dataset — they're separate grants.</dd>
+            <dt>Fix</dt><dd>Grant <code>roles/bigquery.jobUser</code> on the project (to run jobs) and <code>roles/bigquery.dataViewer</code> on the dataset (to read data). <code>bigquery.user</code> covers both for own datasets.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/bigquery/docs/access-control" target="_blank" rel="noopener">bigquery/docs/access-control</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ DATABASES ============ -->
+      <div class="cat-group">
+        <h2>🛢️ Cloud SQL &amp; databases</h2>
+
+        <details class="issue" data-cat="database">
+          <summary><span class="caret">▸</span><span class="sym">App / Cloud Run can't connect to Cloud SQL</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Trying to reach a private IP with no connectivity, or a public IP with no authorized network — plus the connector service often isn't wired up.</dd>
+            <dt>Fix</dt><dd>For Cloud Run, add the Cloud SQL connection (<code>--add-cloudsql-instances</code>) and connect via the Unix socket, or use the Cloud SQL Auth Proxy / connector. For private IP, use a Serverless VPC connector. Grant the runtime SA <code>roles/cloudsql.client</code>.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/sql/docs/mysql/connect-run" target="_blank" rel="noopener">sql/docs/connect-run</a> · <a href="https://cloud.google.com/sql/docs/mysql/connect-auth-proxy" target="_blank" rel="noopener">auth proxy</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="database">
+          <summary><span class="caret">▸</span><span class="sym">Cloud SQL: "too many connections" / connection pool exhausted</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Serverless scale-out opens many connections; each instance's pool multiplies past the DB's <code>max_connections</code>.</dd>
+            <dt>Fix</dt><dd>Use a small per-instance pool, cap Cloud Run <code>--max-instances</code>, raise <code>max_connections</code> via a database flag, or front the DB with a connection pooler (e.g. PgBouncer).</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/sql/docs/mysql/manage-connections" target="_blank" rel="noopener">sql/docs/manage-connections</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ LOGGING ============ -->
+      <div class="cat-group">
+        <h2>📈 Logging &amp; Monitoring</h2>
+
+        <details class="issue" data-cat="logging">
+          <summary><span class="caret">▸</span><span class="sym">Logs aren't showing up in Logs Explorer</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>Wrong time range/resource filter, a log exclusion/sink dropping them, or the workload's SA lacks <code>roles/logging.logWriter</code>.</dd>
+            <dt>Fix</dt><dd>Widen the time range and clear filters; check Logging → <em>Log Router</em> for exclusions; ensure the writing SA has Logs Writer. For VMs, confirm the Ops Agent is installed and running.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/logging/docs/view/logs-explorer-interface" target="_blank" rel="noopener">logging/docs/view/logs-explorer</a> · <a href="https://cloud.google.com/logging/docs/routing/overview" target="_blank" rel="noopener">log router</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="logging">
+          <summary><span class="caret">▸</span><span class="sym">Alerting policy / uptime check never fires (or fires constantly)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>No notification channel attached, threshold/duration misconfigured, or the uptime check can't reach a private endpoint through the firewall.</dd>
+            <dt>Fix</dt><dd>Attach a notification channel to the policy; tune the condition threshold + duration window; for uptime checks, allow Google's uptime-checker source ranges to the target.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/monitoring/alerts" target="_blank" rel="noopener">monitoring/alerts</a> · <a href="https://cloud.google.com/monitoring/uptime-checks" target="_blank" rel="noopener">uptime-checks</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="logging">
+          <summary><span class="caret">▸</span><span class="sym">Logging bill unexpectedly high</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>High-volume logs (data-access audit logs, verbose app logs) ingested beyond the free allotment.</dd>
+            <dt>Fix</dt><dd>Add exclusion filters in the Log Router for noisy, low-value logs; keep only what you need in <code>_Default</code>; route long-term logs to a cheaper bucket/BigQuery sink.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/logging/docs/routing/overview" target="_blank" rel="noopener">logging/docs/routing/overview</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <!-- ============ TERRAFORM / IaC ============ -->
+      <div class="cat-group">
+        <h2>🧱 Terraform &amp; IaC deploys</h2>
+
+        <details class="issue" data-cat="terraform">
+          <summary><span class="caret">▸</span><span class="sym">Terraform apply: "Error 403" or "API not enabled"</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>The identity Terraform runs as lacks the role for that resource, or the service's API isn't enabled in the project.</dd>
+            <dt>Fix</dt><dd>Read the exact permission/API in the error; enable the API (<code>gcloud services enable …</code> or a <code>google_project_service</code> resource) and grant the running SA the needed role. Re-run after propagation.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/docs/terraform/best-practices-for-terraform" target="_blank" rel="noopener">docs/terraform/best-practices</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="terraform">
+          <summary><span class="caret">▸</span><span class="sym">"Error acquiring the state lock" (stale lock)</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>A previous run crashed and left a lock in the GCS backend, or two runs are racing.</dd>
+            <dt>Fix</dt><dd>Make sure no other apply is running, then force-unlock with the lock ID from the error: <code>terraform force-unlock LOCK_ID</code>. Use a GCS backend with per-workspace state to avoid collisions.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/docs/terraform/resource-management/store-state" target="_blank" rel="noopener">terraform/store-state (GCS backend)</a></dd>
+          </dl></div>
+        </details>
+
+        <details class="issue" data-cat="terraform">
+          <summary><span class="caret">▸</span><span class="sym">Terraform wants to destroy/recreate a resource unexpectedly</span></summary>
+          <div class="body"><dl>
+            <dt>Cause</dt><dd>A changed immutable field (name, location) forces replacement, or drift from a manual console change.</dd>
+            <dt>Fix</dt><dd>Read the plan's <code># forces replacement</code> lines; if the resource already exists, <code>terraform import</code> it instead of recreating; use <code>lifecycle { prevent_destroy = true }</code> on critical resources.</dd>
+            <dt class="docs">Docs</dt><dd class="docs"><a href="https://cloud.google.com/docs/terraform/resource-management/import" target="_blank" rel="noopener">terraform/import</a></dd>
+          </dl></div>
+        </details>
+      </div>
+
+      <div class="callout tip">
+        <strong>First-response checklist:</strong> 1) confirm identity &amp; project (<code>gcloud auth list</code>, <code>gcloud config get-value project</code>) · 2) confirm the API is enabled (<code>gcloud services list --enabled</code>) · 3) read the exact error string — GCP names the missing permission/API/quota · 4) check Logs Explorer · 5) wait for propagation before deeper debugging.
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cols">
+        <div><strong>GoogleHelpit</strong> — your nerdy Google IT helper.</div>
+        <div>
+          <a href="index.html">Home</a> ·
+          <a href="workspace-troubleshooting.html">Workspace Fixes</a> ·
+          <a href="learn.html">Learn</a> ·
+          <a href="certifications.html">Certs</a> ·
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
