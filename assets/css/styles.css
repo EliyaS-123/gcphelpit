@@ -14,7 +14,7 @@
   --border-hi: #3a445a;
   --text:      #e6edf3;
   --text-dim:  #9aa7b4;
-  --text-faint:#6b7684;
+  --text-faint:#828d9b;
 
   /* Original accent palette — a nerdy terminal green + four playful chips
      that nod at "four colors" without copying Google's logo. */
@@ -255,7 +255,7 @@ table.data th { background: var(--bg-inset); font-family: var(--mono); color: va
 table.data tr:last-child td { border-bottom: none; }
 table.data tbody tr:hover td { background: var(--bg-alt); }
 .badge { font-family: var(--mono); font-size: .75rem; padding: 2px 8px; border-radius: 12px; white-space: nowrap; }
-.badge.found { background: rgba(74,144,226,.15); color: var(--c-blue); }
+.badge.found { background: rgba(74,144,226,.15); color: #6ba6ee; }
 .badge.assoc { background: rgba(74,226,122,.15); color: var(--c-green); }
 .badge.pro   { background: rgba(226,184,74,.15); color: var(--c-yellow); }
 .badge.soon  { background: rgba(88,166,255,.15); color: var(--accent-2); }
