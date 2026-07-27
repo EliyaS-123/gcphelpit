@@ -59,8 +59,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--accent-2); text-decoration: none; }
+a { color: var(--accent-2); text-decoration: underline; }
 a:hover { text-decoration: underline; }
+/* Navigational / component links sit outside running text, so an underline
+   isn't needed to distinguish them (WCAG "use of color"). In-text links keep it. */
+.brand, .nav-links a, .nav-card, .chip, .go { text-decoration: none; }
 
 .container { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
 
