@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gcphelpit vs Prowler, ScoutSuite &amp; gcp-auditor — GCP Scanner Comparison</title>
+  <meta name="description" content="An honest comparison of gcphelpit with Prowler, ScoutSuite, and gcp-auditor. gcphelpit scans an exported GCP snapshot offline — no live credentials — across security, IAM, cost & reliability.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://eliyas-123.github.io/gcphelpit/compare.html">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="author" content="GoogleHelpit">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="GoogleHelpit">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="gcphelpit vs Prowler, ScoutSuite &amp; gcp-auditor — GCP Scanner Comparison">
+  <meta property="og:description" content="An honest comparison of gcphelpit with Prowler, ScoutSuite, and gcp-auditor. gcphelpit scans an exported GCP snapshot offline — no live credentials — across security, IAM, cost & reliability.">
+  <meta property="og:url" content="https://eliyas-123.github.io/gcphelpit/compare.html">
+  <meta property="og:image" content="https://eliyas-123.github.io/gcphelpit/assets/img/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="gcphelpit vs Prowler, ScoutSuite &amp; gcp-auditor — GCP Scanner Comparison">
+  <meta name="twitter:description" content="An honest comparison of gcphelpit with Prowler, ScoutSuite, and gcp-auditor. gcphelpit scans an exported GCP snapshot offline — no live credentials.">
+  <meta name="twitter:image" content="https://eliyas-123.github.io/gcphelpit/assets/img/og.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://eliyas-123.github.io/gcphelpit/"},{"@type":"ListItem","position":2,"name":"Tool","item":"https://eliyas-123.github.io/gcphelpit/tool.html"},{"@type":"ListItem","position":3,"name":"Comparison","item":"https://eliyas-123.github.io/gcphelpit/compare.html"}]}</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="logo" src="assets/img/logo.svg" alt="GoogleHelpit logo">
+        <span>Google<span class="tag">Helpit</span><span class="cursor">_</span></span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="gcp-troubleshooting.html">GCP Fixes</a>
+        <a href="workspace-troubleshooting.html">Workspace Fixes</a>
+        <a href="tutorials.html">Tutorials</a>
+        <a href="tool.html" class="active">Tool</a>
+        <a href="learn.html">Learn</a>
+        <a href="certifications.html">Certs</a>
+        <a href="about.html">About</a>
+      </nav>
+      <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" style="padding:52px 0 28px">
+      <div class="prompt">$ gcphelpit vs …</div>
+      <h1 style="font-size:clamp(1.9rem,4.5vw,2.8rem)"><span class="grad">gcphelpit</span> vs Prowler, ScoutSuite &amp; gcp-auditor</h1>
+      <p class="sub">
+        An honest look at how gcphelpit compares to the popular open-source GCP scanners — where it fits,
+        and where the alternatives are the better call.
+      </p>
+    </section>
+
+    <section class="prose" style="padding-top:6px">
+      <div class="callout tip">
+        <strong>Short answer:</strong> reach for <strong>gcphelpit</strong> when you want to audit an
+        <strong>exported snapshot of a Google Cloud project offline — with no live credentials</strong> — across
+        <strong>security, IAM, cost, and reliability</strong> in one pass, and get a plain-English fix for each finding.
+        If you need broad multi-cloud security coverage with hundreds of checks, <strong>Prowler</strong> is stronger;
+        for mature read-only posture reports, <strong>ScoutSuite</strong>; for a live GCP-only scan with SARIF/CI output,
+        <strong>gcp-auditor</strong>.
+      </div>
+
+      <h2>At a glance</h2>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>&nbsp;</th>
+              <th>gcphelpit</th>
+              <th>Prowler</th>
+              <th>ScoutSuite</th>
+              <th>gcp-auditor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Approach</strong></td>
+                <td>Offline snapshot (mock-first)</td><td>Live API scan</td><td>Live API scan</td><td>Live API scan</td></tr>
+            <tr><td><strong>Needs cloud credentials</strong></td>
+                <td><strong>No</strong></td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td><strong>Clouds</strong></td>
+                <td>GCP</td><td>AWS, Azure, GCP, K8s, M365</td><td>AWS, Azure, GCP, more</td><td>GCP</td></tr>
+            <tr><td><strong>Security checks</strong></td>
+                <td>✓</td><td>✓ (extensive)</td><td>✓</td><td>✓</td></tr>
+            <tr><td><strong>IAM checks</strong></td>
+                <td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td><strong>Cost checks</strong></td>
+                <td>✓</td><td>—</td><td>—</td><td>✓</td></tr>
+            <tr><td><strong>Reliability checks</strong></td>
+                <td>✓</td><td>—</td><td>—</td><td>✓</td></tr>
+            <tr><td><strong>Plain-English fix per finding</strong></td>
+                <td><strong>✓</strong></td><td>Partial</td><td>—</td><td>✓</td></tr>
+            <tr><td><strong>Output</strong></td>
+                <td>Table, JSON</td><td>CSV, JSON, HTML, SARIF</td><td>HTML report</td><td>HTML, JSON, SARIF, Markdown</td></tr>
+            <tr><td><strong>CI/CD gating (exit code)</strong></td>
+                <td>✓ <code>--fail-on</code></td><td>✓</td><td>—</td><td>✓ (SARIF)</td></tr>
+            <tr><td><strong>Language</strong></td>
+                <td>Python</td><td>Python</td><td>Python</td><td>Python</td></tr>
+            <tr><td><strong>Install</strong></td>
+                <td>pip</td><td>pip, brew, Docker</td><td>pip</td><td>pip</td></tr>
+            <tr><td><strong>License</strong></td>
+                <td>MIT</td><td>Apache-2.0</td><td>GPL-2.0</td><td>MIT</td></tr>
+            <tr><td><strong>Maturity</strong></td>
+                <td>New</td><td>Very mature</td><td>Mature</td><td>New</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="meta">Competitor details reflect public repos/docs as of July 2026 and may change — see each project's repository for the current picture:
+        <a href="https://github.com/prowler-cloud/prowler">Prowler</a>,
+        <a href="https://github.com/nccgroup/ScoutSuite">ScoutSuite</a>,
+        <a href="https://github.com/keymealll/gcp-auditor">gcp-auditor</a>.</p>
+
+      <h2>When to use which</h2>
+      <div class="res-grid">
+        <div class="res-card">
+          <h3>Choose gcphelpit</h3>
+          <p class="meta">offline · plain-English</p>
+          <p>You have (or can export) a JSON snapshot and want to audit it <strong>without granting a tool live access</strong>
+             to your project — across security, IAM, cost, and reliability — with a recommended fix written in plain English for each finding.</p>
+        </div>
+        <div class="res-card">
+          <h3>Choose Prowler</h3>
+          <p class="meta">breadth · multi-cloud</p>
+          <p>You want the widest security &amp; compliance coverage (hundreds of checks, CIS/other benchmarks) across
+             multiple clouds, and you're comfortable giving it live read access.</p>
+        </div>
+        <div class="res-card">
+          <h3>Choose ScoutSuite</h3>
+          <p class="meta">posture reports</p>
+          <p>You want a mature, read-only multi-cloud audit that produces a browsable HTML posture report of your live environment.</p>
+        </div>
+        <div class="res-card">
+          <h3>Choose gcp-auditor</h3>
+          <p class="meta">live GCP · SARIF</p>
+          <p>You want a live GCP-only scan with SARIF/HTML/Markdown output and GitHub-Actions integration, and live credentials are fine.</p>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <strong>The honest wedge:</strong> gcphelpit isn't trying to out-scan Prowler on raw security coverage. Its niche is being
+        the tool you can point at an <strong>exported snapshot with no credentials</strong>, that covers <strong>all four</strong>
+        categories at once, and explains <strong>how to fix</strong> each finding in plain language. If that's your situation, it's
+        the most direct fit. If it isn't, the table above points you to the better tool honestly.
+      </div>
+
+      <p style="margin-top:26px">
+        <a class="go" href="tool.html">← Back to the gcphelpit tool page</a> ·
+        <a class="go" href="https://github.com/EliyaS-123/gcphelpit-cli">View gcphelpit on GitHub →</a>
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cols">
+        <div><strong>GoogleHelpit</strong> — your nerdy Google IT helper.</div>
+        <div>
+          <a href="index.html">Home</a> ·
+          <a href="gcp-troubleshooting.html">GCP Fixes</a> ·
+          <a href="workspace-troubleshooting.html">Workspace Fixes</a> ·
+          <a href="tutorials.html">Tutorials</a> ·
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

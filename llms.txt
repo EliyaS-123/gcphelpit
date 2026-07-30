@@ -1,0 +1,22 @@
+# GoogleHelpit — Google Cloud & Workspace help, and the gcphelpit CLI
+
+> GoogleHelpit is an independent community hub of troubleshooting fixes, tutorials, and certification guides for Google Cloud (GCP) and Google Workspace. Its flagship tool, **gcphelpit**, is a free, open-source command-line tool that scans a JSON snapshot of a Google Cloud project for security, IAM, cost, and reliability issues — each with a plain-English fix. gcphelpit is *mock-first*: it reads an exported snapshot, so it runs with **zero live cloud access or credentials**. Not affiliated with Google LLC.
+
+## gcphelpit CLI
+- [gcphelpit — free CLI to scan Google Cloud for security, IAM & cost issues](https://eliyas-123.github.io/gcphelpit/tool.html): What it is, install, usage, the check catalog, and sample output.
+- [gcphelpit vs Prowler, ScoutSuite & gcp-auditor](https://eliyas-123.github.io/gcphelpit/compare.html): Honest comparison — where gcphelpit's snapshot-based, no-credentials approach fits and where the alternatives are stronger.
+- [gcphelpit source on GitHub](https://github.com/EliyaS-123/gcphelpit-cli): MIT-licensed source, install via `pip install git+https://github.com/EliyaS-123/gcphelpit-cli.git`.
+
+## What gcphelpit checks
+- **Security** — public buckets, world-open firewall ports, public / no-SSL Cloud SQL.
+- **IAM** — primitive owner/editor roles, external members, user-managed service-account keys.
+- **Cost** — unattached disks, idle static IPs, stopped VMs still holding disks, missing budget alerts.
+- **Reliability** — missing DB backups, single-zone production databases, no deletion protection.
+
+## Fixes & learning
+- [GCP troubleshooting fixes](https://eliyas-123.github.io/gcphelpit/gcp-troubleshooting.html): Symptom → cause → fix library for Google Cloud.
+- [Workspace troubleshooting fixes](https://eliyas-123.github.io/gcphelpit/workspace-troubleshooting.html): Fixes for Google Workspace admin issues.
+- [Tutorials](https://eliyas-123.github.io/gcphelpit/tutorials.html): Step-by-step Google Cloud & Workspace guides.
+- [Learn](https://eliyas-123.github.io/gcphelpit/learn.html): Concept explainers.
+- [Certifications](https://eliyas-123.github.io/gcphelpit/certifications.html): Google Cloud certification guides.
+- [About](https://eliyas-123.github.io/gcphelpit/about.html): What GoogleHelpit is and who runs it.

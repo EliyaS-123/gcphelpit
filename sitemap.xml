@@ -26,7 +26,13 @@
   </url>
   <url>
     <loc>https://eliyas-123.github.io/gcphelpit/tool.html</loc>
-    <lastmod>2026-07-24</lastmod>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://eliyas-123.github.io/gcphelpit/compare.html</loc>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
