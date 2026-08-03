@@ -5,6 +5,7 @@
 ## gcphelpit CLI
 - [gcphelpit — free CLI to scan Google Cloud for security, IAM & cost issues](https://eliyas-123.github.io/gcphelpit/tool.html): What it is, install, usage, the check catalog, and sample output.
 - [gcphelpit vs Prowler, ScoutSuite & gcp-auditor](https://eliyas-123.github.io/gcphelpit/compare.html): Honest comparison — where gcphelpit's snapshot-based, no-credentials approach fits and where the alternatives are stronger.
+- [gcphelpit check catalog](https://eliyas-123.github.io/gcphelpit/checks.html): All 16 built-in checks — each with its ID, severity, the issue it flags, a plain-English fix, and a Google Cloud reference.
 - [gcphelpit source on GitHub](https://github.com/EliyaS-123/gcphelpit-cli): MIT-licensed source, install via `pip install git+https://github.com/EliyaS-123/gcphelpit-cli.git`.
 
 ## What gcphelpit checks

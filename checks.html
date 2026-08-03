@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gcphelpit Check Catalog — Every Built-in GCP Security, IAM, Cost &amp; Reliability Check</title>
+  <meta name="description" content="The full catalog of gcphelpit's 16 built-in checks — each with its ID, severity, the issue it flags, a plain-English fix, and an authoritative Google Cloud reference.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://eliyas-123.github.io/gcphelpit/checks.html">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="author" content="GoogleHelpit">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="GoogleHelpit">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="gcphelpit Check Catalog — Every Built-in GCP Security, IAM, Cost &amp; Reliability Check">
+  <meta property="og:description" content="The full catalog of gcphelpit's 16 built-in checks — each with its ID, severity, the issue it flags, a plain-English fix, and an authoritative Google Cloud reference.">
+  <meta property="og:url" content="https://eliyas-123.github.io/gcphelpit/checks.html">
+  <meta property="og:image" content="https://eliyas-123.github.io/gcphelpit/assets/img/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="gcphelpit Check Catalog — Every Built-in GCP Check">
+  <meta name="twitter:description" content="All 16 gcphelpit checks — ID, severity, what it flags, the fix, and a Google Cloud reference.">
+  <meta name="twitter:image" content="https://eliyas-123.github.io/gcphelpit/assets/img/og.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://eliyas-123.github.io/gcphelpit/"},{"@type":"ListItem","position":2,"name":"Tool","item":"https://eliyas-123.github.io/gcphelpit/tool.html"},{"@type":"ListItem","position":3,"name":"Check catalog","item":"https://eliyas-123.github.io/gcphelpit/checks.html"}]}</script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img class="logo" src="assets/img/logo.svg" alt="GoogleHelpit logo">
+        <span>Google<span class="tag">Helpit</span><span class="cursor">_</span></span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="gcp-troubleshooting.html">GCP Fixes</a>
+        <a href="workspace-troubleshooting.html">Workspace Fixes</a>
+        <a href="tutorials.html">Tutorials</a>
+        <a href="tool.html" class="active">Tool</a>
+        <a href="learn.html">Learn</a>
+        <a href="certifications.html">Certs</a>
+        <a href="about.html">About</a>
+      </nav>
+      <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" style="padding:52px 0 20px">
+      <div class="prompt">$ gcphelpit checks</div>
+      <h1 style="font-size:clamp(1.9rem,4.5vw,2.8rem)"><span class="grad">gcphelpit</span> check catalog</h1>
+      <p class="sub">
+        Every built-in check gcphelpit runs — its ID, severity, the issue it flags, a plain-English fix,
+        and an authoritative Google Cloud reference. <strong>16 checks across 4 categories.</strong>
+      </p>
+    </section>
+
+    <section class="prose" style="padding-top:6px">
+      <h2>What is gcphelpit?</h2>
+      <p>gcphelpit is a free, open-source Python CLI that scans a JSON snapshot of a Google Cloud project for
+        security, IAM, cost, and reliability issues in one pass — each finding comes with a plain-English fix.
+        It is <em>mock-first</em>: it reads an exported snapshot, so it runs with no live cloud access or credentials.
+        See the <a href="tool.html">tool page</a> to install and run it, or how it
+        <a href="compare.html">compares to other GCP scanners</a>.</p>
+
+      <p class="meta">Run <code>gcphelpit checks</code> to list these from the CLI. Every check maps to a stable ID
+        (e.g. <code>SEC001</code>) that appears in scan output, so a finding is easy to look up here. Many checks
+        align with the <a href="https://www.cisecurity.org/benchmark/google_cloud_computing_platform">CIS Google Cloud
+        Platform Foundation Benchmark</a>.</p>
+
+      <h2 id="security">🔒 Security checks</h2>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>ID</th><th>Severity</th><th>What it flags</th><th>How to fix</th><th>Reference</th></tr></thead>
+          <tbody>
+            <tr id="SEC001"><td><code>SEC001</code></td><td><strong>HIGH</strong></td>
+              <td>Cloud Storage bucket is publicly accessible</td>
+              <td>Remove <code>allUsers</code>/<code>allAuthenticatedUsers</code> from the bucket IAM policy and turn on public access prevention.</td>
+              <td><a href="https://cloud.google.com/storage/docs/access-control/making-data-public">Bucket access control</a></td></tr>
+            <tr id="SEC002"><td><code>SEC002</code></td><td>MEDIUM</td>
+              <td>Bucket has uniform bucket-level access disabled</td>
+              <td>Enable uniform bucket-level access so legacy ACLs can't grant unintended access.</td>
+              <td><a href="https://cloud.google.com/storage/docs/uniform-bucket-level-access">Uniform bucket-level access</a></td></tr>
+            <tr id="SEC003"><td><code>SEC003</code></td><td><strong>HIGH</strong></td>
+              <td>Firewall rule opens a sensitive port to the internet</td>
+              <td>Restrict the source range from <code>0.0.0.0/0</code> to known IPs; keep ports like 22/3389 off the public internet.</td>
+              <td><a href="https://cloud.google.com/vpc/docs/firewalls">VPC firewall rules</a></td></tr>
+            <tr id="SEC004"><td><code>SEC004</code></td><td><strong>HIGH</strong></td>
+              <td>Cloud SQL instance has a public IP</td>
+              <td>Disable the public IP and connect over Private IP or the Cloud SQL Auth Proxy.</td>
+              <td><a href="https://cloud.google.com/sql/docs/mysql/configure-private-ip">Configure private IP</a></td></tr>
+            <tr id="SEC005"><td><code>SEC005</code></td><td>MEDIUM</td>
+              <td>Cloud SQL does not require SSL/TLS</td>
+              <td>Require SSL/TLS for all connections to the instance.</td>
+              <td><a href="https://cloud.google.com/sql/docs/mysql/configure-ssl-instance">Configure SSL/TLS</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="iam">👤 IAM checks</h2>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>ID</th><th>Severity</th><th>What it flags</th><th>How to fix</th><th>Reference</th></tr></thead>
+          <tbody>
+            <tr id="IAM001"><td><code>IAM001</code></td><td><strong>HIGH</strong></td>
+              <td>Primitive role (owner/editor) granted to a user</td>
+              <td>Replace <code>owner</code>/<code>editor</code> with a least-privilege predefined or custom role.</td>
+              <td><a href="https://cloud.google.com/iam/docs/using-iam-securely#least_privilege">Least privilege</a></td></tr>
+            <tr id="IAM002"><td><code>IAM002</code></td><td><strong>HIGH</strong></td>
+              <td>Service account granted owner/editor at the project level</td>
+              <td>Grant the service account only the specific roles it needs, not owner/editor.</td>
+              <td><a href="https://cloud.google.com/iam/docs/best-practices-service-accounts">Service-account best practices</a></td></tr>
+            <tr id="IAM003"><td><code>IAM003</code></td><td>MEDIUM</td>
+              <td>External (non-organization) member has access</td>
+              <td>Remove external members, or restrict allowed domains with a domain-restriction org policy.</td>
+              <td><a href="https://cloud.google.com/resource-manager/docs/organization-policy/restricting-domains">Restrict domains</a></td></tr>
+            <tr id="IAM004"><td><code>IAM004</code></td><td>MEDIUM</td>
+              <td>Service account has user-managed keys</td>
+              <td>Delete user-managed keys; use workload identity or short-lived credentials instead.</td>
+              <td><a href="https://cloud.google.com/iam/docs/best-practices-for-managing-service-account-keys">Manage SA keys</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="cost">💸 Cost checks</h2>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>ID</th><th>Severity</th><th>What it flags</th><th>How to fix</th><th>Reference</th></tr></thead>
+          <tbody>
+            <tr id="COST001"><td><code>COST001</code></td><td>LOW</td>
+              <td>Unattached persistent disk</td>
+              <td>Delete or snapshot the unattached disk so you stop paying for idle storage.</td>
+              <td><a href="https://cloud.google.com/compute/docs/disks">Persistent disks</a></td></tr>
+            <tr id="COST002"><td><code>COST002</code></td><td>LOW</td>
+              <td>Reserved static IP address is unused</td>
+              <td>Release the reserved static IP that isn't attached to any resource.</td>
+              <td><a href="https://cloud.google.com/vpc/docs/reserve-static-external-ip-address">Static external IPs</a></td></tr>
+            <tr id="COST003"><td><code>COST003</code></td><td>LOW</td>
+              <td>Instance stopped but disks still allocated</td>
+              <td>Delete the stopped VM's disks (or the VM) if they're no longer needed — stopped VMs still bill for disks.</td>
+              <td><a href="https://cloud.google.com/compute/docs/instances/instance-life-cycle">Instance life cycle</a></td></tr>
+            <tr id="COST004"><td><code>COST004</code></td><td>MEDIUM</td>
+              <td>No budget alert configured for the project</td>
+              <td>Create a budget with alert thresholds so spend surprises are caught early.</td>
+              <td><a href="https://cloud.google.com/billing/docs/how-to/budgets">Create budgets</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="reliability">🛟 Reliability checks</h2>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>ID</th><th>Severity</th><th>What it flags</th><th>How to fix</th><th>Reference</th></tr></thead>
+          <tbody>
+            <tr id="REL001"><td><code>REL001</code></td><td><strong>HIGH</strong></td>
+              <td>Cloud SQL instance has no automated backups</td>
+              <td>Enable automated backups (and point-in-time recovery) on the instance.</td>
+              <td><a href="https://cloud.google.com/sql/docs/mysql/backup-recovery/backups">Backups</a></td></tr>
+            <tr id="REL002"><td><code>REL002</code></td><td>LOW</td>
+              <td>Instance has deletion protection disabled</td>
+              <td>Enable deletion protection on production instances to prevent accidental deletion.</td>
+              <td><a href="https://cloud.google.com/compute/docs/instances/preventing-accidental-vm-deletion">Deletion protection</a></td></tr>
+            <tr id="REL003"><td><code>REL003</code></td><td>MEDIUM</td>
+              <td>Cloud SQL instance is not highly available (single zone)</td>
+              <td>Enable high availability (regional) so the database survives a zone outage.</td>
+              <td><a href="https://cloud.google.com/sql/docs/mysql/high-availability">High availability</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip" style="margin-top:26px">
+        <strong>Every finding comes with the fix.</strong> gcphelpit reports the exact resource plus the recommendation above.
+        <a href="tool.html">Install gcphelpit</a> and run <code>gcphelpit scan</code>, or see how it
+        <a href="compare.html">compares to Prowler, ScoutSuite &amp; gcp-auditor</a>.
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cols">
+        <div><strong>GoogleHelpit</strong> — your nerdy Google IT helper.</div>
+        <div>
+          <a href="index.html">Home</a> ·
+          <a href="tool.html">Tool</a> ·
+          <a href="gcp-troubleshooting.html">GCP Fixes</a> ·
+          <a href="compare.html">Compare</a> ·
+          <a href="about.html">About</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
