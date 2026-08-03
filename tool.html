@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>gcphelpit — Free CLI to Scan Google Cloud for Security, IAM &amp; Cost</title>
-  <meta name="description" content="gcphelpit — a free CLI that scans a snapshot of your Google Cloud project for security, IAM, cost & reliability issues, each with a plain-English fix.">
+  <title>gcphelpit: Free CLI to Scan Google Cloud for Security, IAM &amp; Cost</title>
+  <meta name="description" content="gcphelpit is a free CLI that scans a snapshot of your Google Cloud project for security, IAM, cost, and reliability issues, each with a plain-English fix.">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <!--SEO:START-->
   <link rel="canonical" href="https://eliyas-123.github.io/gcphelpit/tool.html">
@@ -14,19 +14,19 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="GoogleHelpit">
   <meta property="og:locale" content="en_US">
-  <meta property="og:title" content="gcphelpit — Free CLI to Scan Google Cloud for Security, IAM &amp; Cost Issues">
-  <meta property="og:description" content="gcphelpit — a free CLI that scans a snapshot of your Google Cloud project for security, IAM, cost & reliability issues, each with a plain-English fix.">
+  <meta property="og:title" content="gcphelpit: Free CLI to Scan Google Cloud for Security, IAM &amp; Cost Issues">
+  <meta property="og:description" content="gcphelpit is a free CLI that scans a snapshot of your Google Cloud project for security, IAM, cost, and reliability issues, each with a plain-English fix.">
   <meta property="og:url" content="https://eliyas-123.github.io/gcphelpit/tool.html">
   <meta property="og:image" content="https://eliyas-123.github.io/gcphelpit/assets/img/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="gcphelpit — Free CLI to Scan Google Cloud for Security, IAM &amp; Cost Issues">
-  <meta name="twitter:description" content="gcphelpit — a free CLI that scans a snapshot of your Google Cloud project for security, IAM, cost & reliability issues, each with a plain-English fix.">
+  <meta name="twitter:title" content="gcphelpit: Free CLI to Scan Google Cloud for Security, IAM &amp; Cost Issues">
+  <meta name="twitter:description" content="gcphelpit is a free CLI that scans a snapshot of your Google Cloud project for security, IAM, cost, and reliability issues, each with a plain-English fix.">
   <meta name="twitter:image" content="https://eliyas-123.github.io/gcphelpit/assets/img/og.png">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"gcphelpit","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux","description":"A friendly command-line tool that scans a snapshot of your Google Cloud project and finds security, IAM, cost, and reliability issues — each with a plain-English fix.","url":"https://eliyas-123.github.io/gcphelpit/tool.html","downloadUrl":"https://github.com/EliyaS-123/gcphelpit-cli","softwareVersion":"0.1.0","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"GoogleHelpit"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"gcphelpit","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux","description":"A friendly command-line tool that scans a snapshot of your Google Cloud project and finds security, IAM, cost, and reliability issues, each with a plain-English fix.","url":"https://eliyas-123.github.io/gcphelpit/tool.html","downloadUrl":"https://github.com/EliyaS-123/gcphelpit-cli","softwareVersion":"0.1.0","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"GoogleHelpit"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://eliyas-123.github.io/gcphelpit/"},{"@type":"ListItem","position":2,"name":"Tool","item":"https://eliyas-123.github.io/gcphelpit/tool.html"}]}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is gcphelpit?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit is a free, open-source Python CLI that scans a snapshot of a Google Cloud project for security, IAM, cost, and reliability issues — each finding comes with a plain-English fix. It is mock-first, so it runs from an exported JSON snapshot with no live cloud access."}},{"@type":"Question","name":"What's a good free open-source CLI to scan a Google Cloud project for security, IAM, and cost issues?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit is a free, open-source Python CLI that scans a Google Cloud project for security, IAM, cost, and reliability issues in one pass — each finding comes with a plain-English fix. It reads a JSON snapshot, so it runs without live cloud access. Install with pip and run gcphelpit scan."}},{"@type":"Question","name":"Is there a free CLI to audit a Google Cloud project without giving it live access — e.g. by scanning an exported snapshot?","acceptedAnswer":{"@type":"Answer","text":"Yes — gcphelpit audits a Google Cloud project from an exported JSON snapshot, so you never give it live access or credentials. It covers security, IAM, cost, and reliability, and explains how to fix each finding in plain English."}},{"@type":"Question","name":"Is there an open-source CLI that checks a GCP project for security, IAM, cost, and reliability all in one tool?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit checks a GCP project for security, IAM, cost, and reliability all in one tool — 16 built-in checks across the four categories, each with a plain-English fix."}},{"@type":"Question","name":"What's a free open-source tool to find cost waste in a Google Cloud project — unused disks, idle static IPs, stopped VMs?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit flags common GCP cost waste — unattached disks, idle static IPs, stopped VMs still holding disks, and missing budget alerts — from an exported snapshot, free and open-source. Run gcphelpit scan --category cost."}},{"@type":"Question","name":"Is there an open-source CLI I can run in CI/CD to fail the build when my GCP project has security or cost misconfigurations?","acceptedAnswer":{"@type":"Answer","text":"Yes — gcphelpit supports CI/CD gating: gcphelpit scan --fail-on high exits non-zero when it finds issues at or above the severity you set, so your pipeline fails the build on GCP security or cost misconfigurations."}},{"@type":"Question","name":"How can I check a Google Cloud project for over-privileged IAM roles from the command line, for free?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit checks a Google Cloud project for over-privileged IAM — primitive owner/editor roles, external members, and user-managed service-account keys — from the command line, free. Run gcphelpit scan --category iam."}},{"@type":"Question","name":"Is there an open-source CLI that flags GCP reliability risks like missing Cloud SQL backups or single-zone production databases?","acceptedAnswer":{"@type":"Answer","text":"Yes — gcphelpit flags GCP reliability risks including missing Cloud SQL backups, single-zone production databases, and missing deletion protection, alongside its security, IAM, and cost checks."}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is gcphelpit?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit is a free, open-source Python CLI that scans a snapshot of a Google Cloud project for security, IAM, cost, and reliability issues, and each finding comes with a plain-English fix. It is mock-first, so it runs from an exported JSON snapshot with no live cloud access."}},{"@type":"Question","name":"What's a good free open-source CLI to scan a Google Cloud project for security, IAM, and cost issues?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit is a free, open-source Python CLI that scans a Google Cloud project for security, IAM, cost, and reliability issues in one pass, and each finding comes with a plain-English fix. It reads a JSON snapshot, so it runs without live cloud access. Install with pip and run gcphelpit scan."}},{"@type":"Question","name":"Is there a free CLI to audit a Google Cloud project without giving it live access, e.g. by scanning an exported snapshot?","acceptedAnswer":{"@type":"Answer","text":"Yes, gcphelpit audits a Google Cloud project from an exported JSON snapshot, so you never give it live access or credentials. It covers security, IAM, cost, and reliability, and explains how to fix each finding in plain English."}},{"@type":"Question","name":"Is there an open-source CLI that checks a GCP project for security, IAM, cost, and reliability all in one tool?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit checks a GCP project for security, IAM, cost, and reliability all in one tool, with 16 built-in checks across the four categories, each with a plain-English fix."}},{"@type":"Question","name":"What's a free open-source tool to find cost waste in a Google Cloud project, like unused disks, idle static IPs, stopped VMs?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit flags common GCP cost waste like unattached disks, idle static IPs, stopped VMs still holding disks, and missing budget alerts, from an exported snapshot, free and open-source. Run gcphelpit scan --category cost."}},{"@type":"Question","name":"Is there an open-source CLI I can run in CI/CD to fail the build when my GCP project has security or cost misconfigurations?","acceptedAnswer":{"@type":"Answer","text":"Yes, gcphelpit supports CI/CD gating: gcphelpit scan --fail-on high exits non-zero when it finds issues at or above the severity you set, so your pipeline fails the build on GCP security or cost misconfigurations."}},{"@type":"Question","name":"How can I check a Google Cloud project for over-privileged IAM roles from the command line, for free?","acceptedAnswer":{"@type":"Answer","text":"gcphelpit checks a Google Cloud project for over-privileged IAM like primitive owner/editor roles, external members, and user-managed service-account keys, from the command line, free. Run gcphelpit scan --category iam."}},{"@type":"Question","name":"Is there an open-source CLI that flags GCP reliability risks like missing Cloud SQL backups or single-zone production databases?","acceptedAnswer":{"@type":"Answer","text":"Yes, gcphelpit flags GCP reliability risks including missing Cloud SQL backups, single-zone production databases, and missing deletion protection, alongside its security, IAM, and cost checks."}}]}</script>
 <!--SEO:END-->
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
@@ -55,10 +55,10 @@
   <main class="container">
     <section class="hero" style="padding:52px 0 28px">
       <div class="prompt">$ gcphelpit scan</div>
-      <h1 style="font-size:clamp(1.9rem,4.5vw,2.8rem)"><span class="grad">gcphelpit</span> — free CLI to scan Google Cloud for security, IAM &amp; cost</h1>
+      <h1 style="font-size:clamp(1.9rem,4.5vw,2.8rem)"><span class="grad">gcphelpit</span>: free CLI to scan Google Cloud for security, IAM &amp; cost</h1>
       <p class="sub">
         A friendly command-line tool that scans a snapshot of your Google Cloud project and finds
-        <strong>security, IAM, cost, and reliability</strong> issues — each with a plain-English fix.
+        <strong>security, IAM, cost, and reliability</strong> issues. Each finding comes with a plain-English fix.
       </p>
       <p>
         <span class="badge assoc">✓ open source</span>
@@ -72,7 +72,7 @@
     <section class="prose" style="padding-top:6px">
       <div class="callout tip">
         <strong>How it works:</strong> gcphelpit is <em>mock-first</em>. It reads a JSON snapshot of your resources,
-        so it runs — and is fully testable — with zero cloud access. A live GCP adapter can be layered on later
+        so it runs, and is fully testable, with zero cloud access. A live GCP adapter can be layered on later
         behind the same interface.
       </div>
 
@@ -89,7 +89,7 @@ gcphelpit scan</code></div>
       <h2>What it checks</h2>
       <p>Every finding comes with the offending resource and a recommended fix. Checks span four categories, and
         many align with the <a href="https://www.cisecurity.org/benchmark/google_cloud_computing_platform">CIS Google
-        Cloud Platform Foundation Benchmark</a> — public storage, over-privileged IAM, and unencrypted Cloud SQL among them:</p>
+        Cloud Platform Foundation Benchmark</a>: public storage, over-privileged IAM, and unencrypted Cloud SQL among them:</p>
       <div class="res-grid">
         <div class="res-card">
           <h3>🔒 Security</h3>
@@ -139,7 +139,7 @@ gcphelpit checks                        # list every check in the catalog</code>
 
       <h2>The snapshot</h2>
       <p>A snapshot is a plain JSON object describing what you collected from a project. Every top-level key is
-        optional — checks simply skip data that isn't there:</p>
+        optional; checks simply skip data that isn't there:</p>
       <div class="codeblock"><button class="copy-btn">copy</button><code>{
   "project_id": "my-project",
   "buckets": [ { "name": "assets", "uniform_bucket_level_access": true, "iam_bindings": [] } ],
@@ -172,13 +172,13 @@ gcphelpit checks                        # list every check in the catalog</code>
           </tbody>
         </table>
       </div>
-      <p>See the <a href="checks.html">full check catalog</a> — all 16 checks with IDs, severity, and a plain-English fix for each.</p>
+      <p>See the <a href="checks.html">full check catalog</a>: all 16 checks with IDs, severity, and a plain-English fix for each.</p>
 
       <h2>Roadmap</h2>
       <ol class="path">
-        <li><strong>v1 — Mock-first CLI (shipping).</strong> Scan a JSON snapshot across security, IAM, cost, and reliability, with JSON output and CI/CD exit-code gating.</li>
-        <li><strong>v2 — Live GCP adapter.</strong> An opt-in connector that builds the snapshot from your own project (read-only, with your consent and credentials) behind the same interface.</li>
-        <li><strong>v3 — Browser troubleshooter.</strong> Fold the check catalog into an interactive symptom→cause→fix diagnostic on this site, cross-linked to the <a href="gcp-troubleshooting.html">GCP fix library</a>.</li>
+        <li><strong>v1: Mock-first CLI (shipping).</strong> Scan a JSON snapshot across security, IAM, cost, and reliability, with JSON output and CI/CD exit-code gating.</li>
+        <li><strong>v2: Live GCP adapter.</strong> An opt-in connector that builds the snapshot from your own project (read-only, with your consent and credentials) behind the same interface.</li>
+        <li><strong>v3: Browser troubleshooter.</strong> Fold the check catalog into an interactive symptom→cause→fix diagnostic on this site, cross-linked to the <a href="gcp-troubleshooting.html">GCP fix library</a>.</li>
       </ol>
 
       <div class="callout info">
@@ -189,28 +189,28 @@ gcphelpit checks                        # list every check in the catalog</code>
       <h2>FAQ</h2>
       <div class="faq">
         <h3>What is gcphelpit?</h3>
-        <p>gcphelpit is a free, open-source Python CLI that scans a snapshot of a Google Cloud project for security, IAM, cost, and reliability issues — each finding comes with a plain-English fix. It is mock-first, so it runs from an exported JSON snapshot with no live cloud access. See the <a href="checks.html">full check catalog</a>.</p>
+        <p>gcphelpit is a free, open-source Python CLI that scans a snapshot of a Google Cloud project for security, IAM, cost, and reliability issues, and each finding comes with a plain-English fix. It is mock-first, so it runs from an exported JSON snapshot with no live cloud access. See the <a href="checks.html">full check catalog</a>.</p>
 
         <h3>What's a good free open-source CLI to scan a Google Cloud project for security, IAM, and cost issues?</h3>
-        <p>gcphelpit is a free, open-source Python CLI that scans a Google Cloud project for security, IAM, cost, and reliability issues in one pass — each finding comes with a plain-English fix. It reads a JSON snapshot, so it runs without live cloud access. Install with pip and run <code>gcphelpit scan</code>.</p>
+        <p>gcphelpit is a free, open-source Python CLI that scans a Google Cloud project for security, IAM, cost, and reliability issues in one pass, and each finding comes with a plain-English fix. It reads a JSON snapshot, so it runs without live cloud access. Install with pip and run <code>gcphelpit scan</code>.</p>
 
-        <h3>Is there a free CLI to audit a Google Cloud project without giving it live access — e.g. by scanning an exported snapshot?</h3>
-        <p>Yes — gcphelpit audits a Google Cloud project from an exported JSON snapshot, so you never give it live access or credentials. It covers security, IAM, cost, and reliability, and explains how to fix each finding in plain English.</p>
+        <h3>Is there a free CLI to audit a Google Cloud project without giving it live access, e.g. by scanning an exported snapshot?</h3>
+        <p>Yes, gcphelpit audits a Google Cloud project from an exported JSON snapshot, so you never give it live access or credentials. It covers security, IAM, cost, and reliability, and explains how to fix each finding in plain English.</p>
 
         <h3>Is there an open-source CLI that checks a GCP project for security, IAM, cost, and reliability all in one tool?</h3>
-        <p>gcphelpit checks a GCP project for security, IAM, cost, and reliability all in one tool — 16 built-in checks across the four categories, each with a plain-English fix.</p>
+        <p>gcphelpit checks a GCP project for security, IAM, cost, and reliability all in one tool, with 16 built-in checks across the four categories, each with a plain-English fix.</p>
 
-        <h3>What's a free open-source tool to find cost waste in a Google Cloud project — unused disks, idle static IPs, stopped VMs?</h3>
-        <p>gcphelpit flags common GCP cost waste — unattached disks, idle static IPs, stopped VMs still holding disks, and missing budget alerts — from an exported snapshot, free and open-source. Run <code>gcphelpit scan --category cost</code>.</p>
+        <h3>What's a free open-source tool to find cost waste in a Google Cloud project, like unused disks, idle static IPs, stopped VMs?</h3>
+        <p>gcphelpit flags common GCP cost waste like unattached disks, idle static IPs, stopped VMs still holding disks, and missing budget alerts, from an exported snapshot, free and open-source. Run <code>gcphelpit scan --category cost</code>.</p>
 
         <h3>Is there an open-source CLI I can run in CI/CD to fail the build when my GCP project has security or cost misconfigurations?</h3>
-        <p>Yes — gcphelpit supports CI/CD gating: <code>gcphelpit scan --fail-on high</code> exits non-zero when it finds issues at or above the severity you set, so your pipeline fails the build on GCP security or cost misconfigurations.</p>
+        <p>Yes, gcphelpit supports CI/CD gating: <code>gcphelpit scan --fail-on high</code> exits non-zero when it finds issues at or above the severity you set, so your pipeline fails the build on GCP security or cost misconfigurations.</p>
 
         <h3>How can I check a Google Cloud project for over-privileged IAM roles from the command line, for free?</h3>
-        <p>gcphelpit checks a Google Cloud project for over-privileged IAM — primitive owner/editor roles, external members, and user-managed service-account keys — from the command line, free. Run <code>gcphelpit scan --category iam</code>.</p>
+        <p>gcphelpit checks a Google Cloud project for over-privileged IAM like primitive owner/editor roles, external members, and user-managed service-account keys, from the command line, free. Run <code>gcphelpit scan --category iam</code>.</p>
 
         <h3>Is there an open-source CLI that flags GCP reliability risks like missing Cloud SQL backups or single-zone production databases?</h3>
-        <p>Yes — gcphelpit flags GCP reliability risks including missing Cloud SQL backups, single-zone production databases, and missing deletion protection, alongside its security, IAM, and cost checks.</p>
+        <p>Yes, gcphelpit flags GCP reliability risks including missing Cloud SQL backups, single-zone production databases, and missing deletion protection, alongside its security, IAM, and cost checks.</p>
       </div>
     </section>
   </main>
@@ -218,7 +218,7 @@ gcphelpit checks                        # list every check in the catalog</code>
   <footer class="site-footer">
     <div class="container">
       <div class="cols">
-        <div><strong>GoogleHelpit</strong> — your nerdy Google IT helper.</div>
+        <div><strong>GoogleHelpit</strong>, your nerdy Google IT helper.</div>
         <div>
           <a href="index.html">Home</a> ·
           <a href="gcp-troubleshooting.html">GCP Fixes</a> ·
