@@ -57,6 +57,10 @@
       <h1 class="section-title" style="font-size:1.9rem"><span class="hash">#</span> GCP Troubleshooting</h1>
       <p class="section-sub">The errors people actually hit on Google Cloud — symptom → cause → fix → official docs. Search or filter by area, click a card to expand.</p>
 
+      <div class="callout tip" style="margin:16px 0">
+        <strong>Catch these before they bite:</strong> <a href="tool.html">gcphelpit</a> is our free open-source CLI that scans a snapshot of your Google Cloud project for security, IAM, cost &amp; reliability issues — each with a plain-English fix. <a href="compare.html">See how it compares</a> to other GCP scanners.
+      </div>
+
       <div class="filter-bar">
         <input id="filter-box" class="filter-box" type="search" placeholder="Filter fixes… e.g. 'PERMISSION_DENIED', 'PORT', 'quota'" autocomplete="off" aria-label="Filter GCP fixes">
       </div>
@@ -712,6 +716,7 @@ gcloud config set project PROJECT_ID</code></div>
 
   <footer class="site-footer">
     <div class="container">
+      <p style="margin:0 0 14px;font-size:.92rem">🔧 Try <a href="tool.html"><strong>gcphelpit</strong></a> — our free CLI that scans a Google Cloud project for security, IAM, cost &amp; reliability issues, each with a plain-English fix. <a href="compare.html">See how it compares →</a></p>
       <div class="cols">
         <div><strong>GoogleHelpit</strong> — your nerdy Google IT helper.</div>
         <div>
