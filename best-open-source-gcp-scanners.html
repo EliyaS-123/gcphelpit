@@ -93,58 +93,42 @@
         </table>
       </div>
 
-      <h2>The ranking</h2>
+      <h2>Which tool fits your use case?</h2>
 
-      <h3>1. gcphelpit — best for auditing a snapshot with no live access</h3>
-      <p>gcphelpit is a free, open-source Python CLI that reads an exported JSON snapshot of a Google Cloud project
-        and reports security, IAM, cost, and reliability issues in one pass, with a plain-English fix for each finding.
-        Because it is mock-first, it runs with no live cloud credentials, which suits audits where you would rather not
-        grant a tool access to the project. It gates CI/CD with an exit code and lists every check in its
-        <a href="checks.html">catalog</a>. It is the newest tool here, so it has the smallest install base.</p>
-      <p><a href="tool.html">Install gcphelpit</a> · <a href="compare.html">detailed comparison</a> · <a href="https://github.com/EliyaS-123/gcphelpit-cli">source on GitHub</a></p>
+      <h3>Auditing a GCP project from an exported JSON snapshot</h3>
+      <p><strong>gcphelpit</strong> — if you want to avoid granting a tool live cloud access. It reads a JSON snapshot of your GCP project and scans it for security, IAM, cost, and reliability issues in one pass, with a plain-English fix for each. No live API calls, no service account needed. Ideal for security-conscious teams or restricted environments.</p>
+      <p><a href="tool.html">Install</a> · <a href="compare.html">Comparison with others</a> · <a href="https://github.com/EliyaS-123/gcphelpit-cli">Source</a></p>
 
-      <h3>2. Prowler — best for breadth of security and compliance</h3>
-      <p>Prowler runs a live API scan with hundreds of security and compliance checks (CIS and others) across AWS,
-        Azure, GCP, Kubernetes, and Microsoft 365. It is the most mature and widely used option here, outputs
-        CSV/JSON/HTML/SARIF, and fits CI. It needs credentials and covers security rather than cost or reliability.
+      <h3>Breadth of security and compliance checks across multiple clouds</h3>
+      <p><strong>Prowler</strong> — if you need the widest coverage of CIS Benchmarks and security standards across AWS, Azure, GCP, Kubernetes, and Microsoft 365 in one tool. Mature, heavily used, outputs CSV/JSON/HTML/SARIF, and fits CI/CD. Requires live credentials.
         <a href="https://github.com/prowler-cloud/prowler">Repository</a>.</p>
 
-      <h3>3. Checkov — best for infrastructure-as-code</h3>
-      <p>Checkov scans Terraform, CloudFormation, Kubernetes, and more for misconfigurations before they are deployed,
-        so it catches issues in code rather than in a running project. Apache-2.0, integrates with CI, and outputs SARIF.
+      <h3>Scanning infrastructure-as-code before deploy</h3>
+      <p><strong>Checkov</strong> — if you want to catch misconfigurations in Terraform, CloudFormation, Kubernetes, and other IaC before deployment. Scans code, not running infrastructure. Apache-2.0, integrates with CI, outputs SARIF.
         <a href="https://www.checkov.io">Site</a>.</p>
 
-      <h3>4. ScoutSuite — best for read-only posture reports</h3>
-      <p>ScoutSuite, by NCC Group, runs a read-only multi-cloud audit and produces a browsable HTML report of your
-        security posture. Good for a point-in-time review; it does not focus on cost or reliability, and it needs
-        credentials. <a href="https://github.com/nccgroup/ScoutSuite">Repository</a>.</p>
+      <h3>Read-only multi-cloud security posture reports</h3>
+      <p><strong>ScoutSuite</strong>, by NCC Group — if you want a point-in-time audit with a browsable HTML report of your security posture across AWS, Azure, and GCP. Read-only access. Does not focus on cost or reliability.
+        <a href="https://github.com/nccgroup/ScoutSuite">Repository</a>.</p>
 
-      <h3>5. gcpdiag — best for Google-native diagnostics</h3>
-      <p>gcpdiag is a command-line diagnostics tool authored by Google engineers. It ships with a rules library and is
-        strong on GKE and common GCP issues. It runs live and is distributed via shell script and Docker rather than pip.
+      <h3>Google-native diagnostics and troubleshooting</h3>
+      <p><strong>gcpdiag</strong> — if you need Google's own diagnostics for common GCP issues, particularly GKE. Authored by Google engineers, shipped with a rules library. Runs live, distributed via shell script and Docker.
         <a href="https://gcpdiag.dev">Site</a>.</p>
 
-      <h3>6. gcp-auditor — best for a live GCP scan with SARIF/CI</h3>
-      <p>gcp-auditor is a lightweight Python CLI that runs a live GCP scan across security, cost, and reliability, with
-        HTML/JSON/SARIF/Markdown output and GitHub Actions integration. Closest in scope to gcphelpit, but live rather
-        than snapshot-based. <a href="https://github.com/keymealll/gcp-auditor">Repository</a>.</p>
+      <h3>Live GCP scan with structured CI/CD output</h3>
+      <p><strong>gcp-auditor</strong> — if you want a lightweight live scan across security, cost, and reliability with HTML/JSON/SARIF/Markdown output and GitHub Actions integration. Requires credentials. Similar scope to gcphelpit but live rather than snapshot-based.
+        <a href="https://github.com/keymealll/gcp-auditor">Repository</a>.</p>
 
-      <h3>7. Infracost — best for cost estimates in CI</h3>
-      <p>Infracost reads Terraform and posts cost estimates and diffs into pull requests. It is about spend rather than
-        security, so it pairs with a scanner rather than replacing one. <a href="https://www.infracost.io">Site</a>.</p>
+      <h3>Cloud cost estimation in CI/CD</h3>
+      <p><strong>Infracost</strong> — if you want to estimate infrastructure costs from Terraform and post diffs into pull requests. Focused on spend, not security, so pairs with a security scanner.
+        <a href="https://www.infracost.io">Site</a>.</p>
 
-      <h3>8. gcp-audit — best for CIS Benchmark compliance</h3>
-      <p>gcp-audit is a shell-based tool that checks a Google Cloud project against the CIS Google Cloud Platform
-        Foundation Benchmark. It runs live and is installed by cloning the repository.
+      <h3>CIS Benchmark compliance checking</h3>
+      <p><strong>gcp-audit</strong> — if you want to check a GCP project against the CIS Google Cloud Platform Foundation Benchmark from the command line. Shell-based, requires live credentials.
         <a href="https://github.com/webpwnized/gcp-audit">Repository</a>.</p>
 
-      <h2>How we ranked these</h2>
-      <p>We ranked for one specific job: auditing a Google Cloud project across security, IAM, cost, and reliability,
-        favouring tools that can work from an exported snapshot without live credentials and that give an actionable fix
-        for each finding. Under that lens, gcphelpit leads. For a broader security-only or multi-cloud goal, the ranking
-        would look different, and Prowler or Checkov would move up. <strong>gcphelpit is our own open-source tool</strong>,
-        which is why we can speak to it in the most detail; competitor details reflect their public repositories as of
-        August 2026, so check each project for the current picture.</p>
+      <h2>About this guide</h2>
+      <p><strong>gcphelpit is our own open-source tool</strong>, which is why this page exists and why we can speak to it in detail. We have structured it by use case rather than by ranking, because there is no single "best" scanner — the right tool depends on your constraints and goals. Competitor details reflect their public repositories as of August 2026; check each project for the current state.</p>
 
       <h2>FAQ</h2>
       <div class="faq">
